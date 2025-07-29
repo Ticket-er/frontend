@@ -1,21 +1,16 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
-  fundWallet,
   checkWalletBalance,
   withdrawFromWallet,
   getWalletTransactions,
+  checkWalletPinStatus,
+  setWalletPin,
 } from "./wallet";
-import type { FundWalletPayload, WithdrawPayload } from "@/types/wallet.type";
+import type {
+  SetWalletPinPayload,
+  WithdrawPayload,
+} from "@/types/wallet.type";
 
-// Fund wallet (initiate payment)
-export const useFundWallet = () =>
-  useMutation({
-    mutationFn: (data: FundWalletPayload) => fundWallet(data),
-
-    onSuccess: ({ checkoutUrl }) => {
-      window.location.href = checkoutUrl;
-    },
-  });
 
 // Get wallet balance
 export const useWalletBalance = () =>
@@ -35,4 +30,18 @@ export const useWalletTransactions = () =>
   useQuery({
     queryKey: ["wallet-transactions"],
     queryFn: getWalletTransactions,
+  });
+
+// Check if wallet PIN is set
+export const useWalletPinStatus = () =>
+  useQuery({
+    queryKey: ["wallet-pin-status"],
+    queryFn: checkWalletPinStatus,
+  });
+
+// Set or update wallet PIN
+export const useSetWalletPin = () =>
+  useMutation({
+    mutationFn: ({ newPin, oldPin }: SetWalletPinPayload) =>
+      setWalletPin(newPin, oldPin),
   });

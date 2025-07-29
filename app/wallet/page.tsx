@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import {
   useWalletBalance,
   useWalletTransactions,
+  useWalletPinStatus,
 } from "@/api/wallet/wallet.queries";
 import { useAuth } from "@/lib/auth-context";
 import Link from "next/link";
@@ -17,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { PayoutModal } from "@/components/payout-modal";
 import { TransactionDetailsModal } from "@/components/transaction-details-modal";
 import { formatPrice } from "@/lib/dummy-data";
+import PinModal from "@/components/pin-modal";
 
 interface Transaction {
   id: string;
@@ -34,6 +36,11 @@ export default function WalletPage() {
   const { user: currentUser, isLoading } = useAuth();
   const router = useRouter();
   const {
+    data: pinStatus,
+    isLoading: loadingPinStatus,
+    isError: errorPinStatus,
+  } = useWalletPinStatus();
+  const {
     data: transactions = [], // Default to empty array to avoid undefined
     isLoading: loadingTransactions,
     isError: errorTransactions,
@@ -44,6 +51,7 @@ export default function WalletPage() {
     isError: errorBalance,
   } = useWalletBalance();
   const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] =
     useState<Transaction | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,11 +65,14 @@ export default function WalletPage() {
       );
       return;
     }
-    if (currentUser && !["ORGANIZER", "ADMIN", "SUPERADMIN"].includes(currentUser.role)) {
+    if (
+      currentUser &&
+      !["ORGANIZER", "ADMIN", "SUPERADMIN"].includes(currentUser.role)
+    ) {
       router.push("/explore");
       return;
     }
-  }, [currentUser, router]);
+  }, [currentUser, isLoading, router]);
 
   // Filter transactions based on search term
   const filteredTransactions = useMemo(() => {
@@ -120,7 +131,7 @@ export default function WalletPage() {
     }
   };
 
-   if (isLoading) {
+  if (isLoading || loadingPinStatus) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -131,10 +142,10 @@ export default function WalletPage() {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Loading Authentication...
+            Loading...
           </h2>
           <p className="text-gray-600">
-            Please wait while we verify your session
+            Please wait while we load your wallet data
           </p>
         </div>
       </motion.div>
@@ -146,6 +157,61 @@ export default function WalletPage() {
     !["ORGANIZER", "ADMIN", "SUPERADMIN"].includes(currentUser.role)
   ) {
     return null;
+  }
+
+  if (errorPinStatus) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center"
+        >
+          <p className="text-lg text-red-600 mb-4">
+            Failed to load wallet PIN status. Please try again.
+          </p>
+          <Button
+            variant="outline"
+            className="bg-transparent border-gray-300 hover:bg-gray-100 text-gray-900"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </Button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (!pinStatus?.hasPin) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Wallet Setup
+          </h1>
+          <p className="text-lg text-gray-600 mb-6 max-w-md">
+            Please set a 4-digit PIN to secure your wallet and enable transactions.
+          </p>
+          <Button
+            onClick={() => setIsPinModalOpen(true)}
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Set Wallet PIN
+          </Button>
+          <PinModal
+            isOpen={isPinModalOpen}
+            onClose={() => setIsPinModalOpen(false)}
+            hasPin={false}
+          />
+        </motion.div>
+      </div>
+    );
   }
 
   if (loadingTransactions || loadingBalance) {
@@ -229,14 +295,23 @@ export default function WalletPage() {
                     <p className="text-4xl font-bold text-gray-900">
                       {formatPrice(balanceData?.balance || 0)}
                     </p>
-                    <Button
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
-                      onClick={() => setIsPayoutModalOpen(true)}
-                      disabled={(balanceData?.balance || 0) <= 0}
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Request Payout
-                    </Button>
+                    <div className="space-y-2">
+                      <Button
+                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                        onClick={() => setIsPayoutModalOpen(true)}
+                        disabled={(balanceData?.balance || 0) <= 0}
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Request Payout
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full border-gray-300 hover:bg-gray-100 text-gray-900 rounded-full px-6"
+                        onClick={() => setIsPinModalOpen(true)}
+                      >
+                        Change PIN
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -423,6 +498,11 @@ export default function WalletPage() {
           isOpen={isPayoutModalOpen}
           onClose={() => setIsPayoutModalOpen(false)}
           availableBalance={balanceData?.balance || 0}
+        />
+        <PinModal
+          isOpen={isPinModalOpen}
+          onClose={() => setIsPinModalOpen(false)}
+          hasPin={pinStatus?.hasPin || false}
         />
         <TransactionDetailsModal
           isOpen={!!selectedTransaction}

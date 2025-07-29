@@ -9,6 +9,7 @@ import {
   ResendOtpDto,
   AuthResponse,
   BasicResponse,
+  ChangePasswordDto,
 } from "@/types/auth.type";
 
 // REGISTER user
@@ -88,6 +89,21 @@ export const resetPassword = async (
     return res.data;
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || "Failed to reset password";
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+};
+
+// CHANGE PASSWORD
+export const changePassword = async (
+  dto: ChangePasswordDto
+): Promise<BasicResponse> => {
+  try {
+    const res = await axios.post("/auth/change-password", dto);
+    toast.success(res.data.message || "Password changed successfully");
+    return res.data;
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.message || "Failed to change password";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }

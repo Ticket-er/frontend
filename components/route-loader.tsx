@@ -6,13 +6,13 @@ import { motion } from "framer-motion";
 export default function RouteLoader() {
   return (
     <motion.div
-      className="flex items-center justify-center h-screen w-full"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
     >
-      <div className="flex flex-col items-center gap-2 text-center">
-        <Loader2 className="animate-spin h-8 w-8 text-primary" />
-        <p className="text-muted-foreground text-sm">Loading page...</p>
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
       </div>
     </motion.div>
   );

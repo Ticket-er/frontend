@@ -66,3 +66,17 @@ export interface TicketSummary {
   code: string;
   event: EventSummary;
 }
+
+export interface PinStatusResponse {
+  hasPin: boolean;
+}
+
+
+export interface SetWalletPinPayload {
+  newPin: string;
+  oldPin?: string;
+}
+
+export interface SetWalletPinResponse {
+  message: string;
+}

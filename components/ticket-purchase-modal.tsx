@@ -40,8 +40,7 @@ export function TicketPurchaseModal({
   const { mutateAsync: buyTicket, isPending: isBuying } = useBuyTicket();
 
   const subtotal = event.price * ticketQuantity;
-  const serviceFee = Math.round(subtotal * 0.05);
-  const total = subtotal + serviceFee;
+  const total = subtotal;
 
   const handleContinue = () => {
     if (!user) {
@@ -176,12 +175,6 @@ export function TicketPurchaseModal({
                       </span>
                       <span className="text-gray-900">
                         {formatPrice(subtotal)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Service fee</span>
-                      <span className="text-gray-900">
-                        {formatPrice(serviceFee)}
                       </span>
                     </div>
                     <div className="border-t border-gray-200 pt-2 flex justify-between font-semibold">

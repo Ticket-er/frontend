@@ -39,13 +39,6 @@ export default function MyTicketsPage() {
       );
       return;
     }
-    if (
-      currentUser &&
-      !["ORGANIZER", "ADMIN", "SUPERADMIN"].includes(currentUser.role)
-    ) {
-      router.push("/explore");
-      return;
-    }
   }, [currentUser, router]);
   // Group tickets by event ID
   const groupedTickets = userTickets?.reduce(

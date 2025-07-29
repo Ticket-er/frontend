@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { User, Lock, Camera, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useUpdateUser } from "@/api/user/user.queries";
 import { useRouter } from "next/navigation";
+import { useChangePassword } from "@/api/auth/auth.queries";
 
 const profileSchema = z.object({
   name: z.string().min(2, { message: "Name is too short" }),
@@ -21,11 +22,27 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
+const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z
+      .string()
+      .min(6, "New password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your new password"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>;
+
 export default function SettingsPage() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const updateUserMutation = useUpdateUser();
+  const changePasswordMutation = useChangePassword();
   const { isLoading, user: currentUser } = useAuth();
   const router = useRouter();
 
@@ -33,6 +50,7 @@ export default function SettingsPage() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -40,10 +58,19 @@ export default function SettingsPage() {
     },
   });
 
-  const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+  const {
+    register: registerPassword,
+    handleSubmit: handlePasswordSubmit,
+    formState: { errors: passwordErrors },
+    reset: resetPasswordForm,
+    watch: watchPassword,
+  } = useForm<ChangePasswordFormValues>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
   });
 
   useEffect(() => {
@@ -53,18 +80,8 @@ export default function SettingsPage() {
       );
       return;
     }
-    if (
-      currentUser &&
-      !["ORGANIZER", "ADMIN", "SUPERADMIN"].includes(currentUser.role)
-    ) {
-      router.push("/explore");
-      return;
-    }
-  }, [currentUser, router]);
+  }, [currentUser, router, isLoading]);
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -73,10 +90,20 @@ export default function SettingsPage() {
     }
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Changing password:", formData);
-    // Add mutation for changing password here
+  const handleChangePassword = (data: ChangePasswordFormValues) => {
+    changePasswordMutation.mutate(
+      {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      },
+      {
+        onSuccess: () => {
+          resetPasswordForm();
+          setSelectedImage(null); // Reset image if needed
+          setPreviewUrl(null);
+        },
+      }
+    );
   };
 
   const onSubmit = (data: ProfileFormValues) => {
@@ -85,8 +112,31 @@ export default function SettingsPage() {
     if (selectedImage) {
       formPayload.append("file", selectedImage);
     }
-    updateUserMutation.mutate(formPayload);
+    updateUserMutation.mutate(formPayload, {
+      onSuccess: () => {
+        setSelectedImage(null); // Reset image after successful submission
+        setPreviewUrl(null);
+      },
+    });
   };
+
+  // Watch form values to detect changes
+  const nameValue = watch("name");
+  const passwordValues = watchPassword();
+
+  // Check if profile form has changes
+  const hasProfileChanges = useMemo(() => {
+    return nameValue !== (currentUser?.name || "") || selectedImage !== null;
+  }, [nameValue, currentUser?.name, selectedImage]);
+
+  // Check if password form has changes
+  const hasPasswordChanges = useMemo(() => {
+    return (
+      passwordValues.currentPassword !== "" ||
+      passwordValues.newPassword !== "" ||
+      passwordValues.confirmPassword !== ""
+    );
+  }, [passwordValues]);
 
   if (isLoading) {
     return (
@@ -147,7 +197,7 @@ export default function SettingsPage() {
                       className="w-20 h-20 rounded-full mx-auto object-cover"
                     />
                     <label htmlFor="fileUpload">
-                      <div className=" absolute bottom-0 right-0 flex items-center justify-center border border-gray-300 bg-white shadow-sm rounded-full">
+                      <div className="absolute bottom-0 right-0 flex items-center justify-center border border-gray-300 bg-white shadow-sm rounded-full">
                         <Camera className="h-4 w-4" />
                       </div>
                     </label>
@@ -241,7 +291,9 @@ export default function SettingsPage() {
                       </div>
                       <Button
                         type="submit"
-                        disabled={updateUserMutation.isPending}
+                        disabled={
+                          updateUserMutation.isPending || !hasProfileChanges
+                        }
                         className="mt-4 sm:mt-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       >
                         Save Changes
@@ -265,7 +317,10 @@ export default function SettingsPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleChangePassword} className="space-y-4">
+                    <form
+                      onSubmit={handlePasswordSubmit(handleChangePassword)}
+                      className="space-y-4"
+                    >
                       <div className="space-y-2">
                         <label
                           htmlFor="currentPassword"
@@ -276,11 +331,13 @@ export default function SettingsPage() {
                         <Input
                           id="currentPassword"
                           type="password"
-                          value={formData.currentPassword}
-                          onChange={(e) =>
-                            handleInputChange("currentPassword", e.target.value)
-                          }
+                          {...registerPassword("currentPassword")}
                         />
+                        {passwordErrors.currentPassword && (
+                          <p className="text-sm text-red-500">
+                            {passwordErrors.currentPassword.message}
+                          </p>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <label
@@ -292,11 +349,13 @@ export default function SettingsPage() {
                         <Input
                           id="newPassword"
                           type="password"
-                          value={formData.newPassword}
-                          onChange={(e) =>
-                            handleInputChange("newPassword", e.target.value)
-                          }
+                          {...registerPassword("newPassword")}
                         />
+                        {passwordErrors.newPassword && (
+                          <p className="text-sm text-red-500">
+                            {passwordErrors.newPassword.message}
+                          </p>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <label
@@ -308,15 +367,20 @@ export default function SettingsPage() {
                         <Input
                           id="confirmPassword"
                           type="password"
-                          value={formData.confirmPassword}
-                          onChange={(e) =>
-                            handleInputChange("confirmPassword", e.target.value)
-                          }
+                          {...registerPassword("confirmPassword")}
                         />
+                        {passwordErrors.confirmPassword && (
+                          <p className="text-sm text-red-500">
+                            {passwordErrors.confirmPassword.message}
+                          </p>
+                        )}
                       </div>
                       <Button
                         type="submit"
-                        disabled={updateUserMutation.isPending}
+                        disabled={
+                          changePasswordMutation.isPending ||
+                          !hasPasswordChanges
+                        }
                         variant="outline"
                         className="mt-4 sm:mt-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       >
@@ -333,4 +397,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

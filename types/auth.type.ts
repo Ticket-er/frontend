@@ -18,7 +18,7 @@ export interface VerifyOtpDto {
 
 export interface ResendOtpDto {
   email: string;
-  context: 'register' | 'forgot-password';
+  context: "register" | "forgot-password";
 }
 
 export interface ForgotPasswordDto {
@@ -33,9 +33,14 @@ export interface ResetPasswordDto {
 
 export interface AuthResponse {
   access_token: string;
-  user: User
+  user: User;
 }
 
 export interface BasicResponse {
   message: string;
+}
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
 }

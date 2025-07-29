@@ -6,6 +6,7 @@ import {
   resendOtp,
   forgotPassword,
   resetPassword,
+  changePassword,
 } from "./auth";
 import {
   RegisterDto,
@@ -14,6 +15,7 @@ import {
   ResendOtpDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  ChangePasswordDto,
 } from "@/types/auth.type";
 
 export const useRegister = () =>
@@ -50,4 +52,9 @@ export const useForgotPassword = () =>
 export const useResetPassword = () =>
   useMutation({
     mutationFn: (dto: ResetPasswordDto) => resetPassword(dto),
+  });
+
+export const useChangePassword = () =>
+  useMutation({
+    mutationFn: (dto: ChangePasswordDto) => changePassword(dto),
   });
