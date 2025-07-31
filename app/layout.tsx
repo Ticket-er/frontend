@@ -1,17 +1,27 @@
 import type React from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "../lib/provider";
 import { Header } from "@/components/layout/header";
+import Head from "./head";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ticket-er - Event Ticketing Platform",
-  description: "Discover and book tickets for amazing events",
-  generator: "v0.dev",
+  keywords: [
+    "event ticketing",
+    "book tickets",
+    "event management",
+    "ticket booking platform",
+    "discover events",
+  ],
 };
+
+export const viewport: Viewport = {
+  themeColor: "#2563EB",
+};
+
 
 export default function RootLayout({
   children,
@@ -20,6 +30,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <Head />
       <body className={inter.className}>
         <Providers>
           <Header />

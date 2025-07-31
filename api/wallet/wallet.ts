@@ -49,6 +49,8 @@ export const setWalletPin = async (
       ...(oldPin && { oldPin }),
     });
 
+
+
     return res.data;
   } catch (error: any) {
     const errorMessage =
