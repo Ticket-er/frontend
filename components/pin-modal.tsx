@@ -1,62 +1,64 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { useSetWalletPin } from "@/api/wallet/wallet.queries"
-import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
-import { SetWalletPinPayload } from "@/types/wallet.type"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { useSetWalletPin } from "@/api/wallet/wallet.queries";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { SetWalletPinPayload } from "@/types/wallet.type";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp"
+} from "@/components/ui/input-otp";
 
 interface PinModalProps {
-  isOpen: boolean
-  onClose: () => void
-  hasPin: boolean
+  isOpen: boolean;
+  onClose: () => void;
+  hasPin: boolean;
 }
 
 export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
-  const [newPin, setNewPin] = useState("")
-  const [oldPin, setOldPin] = useState("")
-  const { mutateAsync, isPending } = useSetWalletPin()
-  const queryClient = useQueryClient()
+  const [newPin, setNewPin] = useState("");
+  const [oldPin, setOldPin] = useState("");
+  const { mutateAsync, isPending } = useSetWalletPin();
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
-      toast.error("New PIN must be exactly 4 digits")
-      return
+      toast.error("New PIN must be exactly 4 digits");
+      return;
     }
     if (hasPin && (oldPin.length !== 4 || !/^\d{4}$/.test(oldPin))) {
-      toast.error("Current PIN must be exactly 4 digits")
-      return
+      toast.error("Current PIN must be exactly 4 digits");
+      return;
     }
-    const payload: SetWalletPinPayload = { newPin }
+    const payload: SetWalletPinPayload = { newPin };
     if (hasPin) {
-      payload.oldPin = oldPin
+      payload.oldPin = oldPin;
     }
     try {
-      await mutateAsync(payload)
-      toast.success(hasPin ? "PIN updated successfully" : "PIN set successfully")
-      queryClient.invalidateQueries({ queryKey: ["wallet-pin-status"] })
-      setNewPin("")
-      setOldPin("")
-      onClose()
+      await mutateAsync(payload);
+      toast.success(
+        hasPin ? "PIN updated successfully" : "PIN set successfully"
+      );
+      queryClient.invalidateQueries({ queryKey: ["wallet-pin-status"] });
+      setNewPin("");
+      setOldPin("");
+      onClose();
     } catch (error: any) {
-      console.error("Error setting PIN:", error.message)
+      console.error("Error setting PIN:", error.message);
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -66,11 +68,17 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
             {hasPin ? "Update Wallet PIN" : "Set Wallet PIN"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="w-full flex flex-col items-center">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full flex flex-col items-center"
+        >
           <div className="space-y-6 py-4 w-full">
             {hasPin && (
               <div className="flex flex-col items-center gap-2">
-                <Label htmlFor="oldPin" className="text-sm font-medium text-gray-900 text-center">
+                <Label
+                  htmlFor="oldPin"
+                  className="text-sm font-medium text-gray-900 text-center"
+                >
                   Current PIN
                 </Label>
                 <InputOTP
@@ -104,7 +112,10 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
               </div>
             )}
             <div className="flex flex-col items-center gap-2">
-              <Label htmlFor="newPin" className="text-sm font-medium text-gray-900 text-center">
+              <Label
+                htmlFor="newPin"
+                className="text-sm font-medium text-gray-900 text-center"
+              >
                 New PIN
               </Label>
               <InputOTP
@@ -138,7 +149,8 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
             </div>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-800 text-center">
-                <strong>Note:</strong> Your PIN must be a 4-digit number. Keep it secure and do not share it with anyone.
+                <strong>Note:</strong> Your PIN must be a 4-digit number. Keep
+                it secure and do not share it with anyone.
               </p>
             </div>
           </div>
@@ -153,7 +165,7 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
               Cancel
             </Button>
             <Button
-              className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
               type="submit"
               disabled={isPending}
             >
@@ -163,5 +175,5 @@ export default function PinModal({ isOpen, onClose, hasPin }: PinModalProps) {
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

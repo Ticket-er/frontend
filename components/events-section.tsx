@@ -14,7 +14,7 @@ export function EventsSection() {
   const { data: events } = useAllEvents();
   console.log(events);
   return (
-    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-purple-50">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -50,13 +50,13 @@ export function EventsSection() {
                     height={200}
                     className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-purple-600">
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
                     {formatPrice(event.price)}
                   </div>
                 </div>
 
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
                     {event.name}
                   </h3>
 
@@ -77,7 +77,7 @@ export function EventsSection() {
 
                   <Button
                     onClick={() => router.push("/events")}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full font-semibold transition-all duration-300"
+                    className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full font-semibold transition-all duration-300"
                   >
                     Buy Now
                   </Button>
@@ -98,7 +98,7 @@ export function EventsSection() {
             variant="outline"
             size="lg"
             onClick={() => router.push("/explore")}
-            className="border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 bg-transparent"
+            className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 bg-transparent"
           >
             View All Events
           </Button>

@@ -15,6 +15,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useRegister } from "@/api/auth/auth.queries";
 import { useBecomeOrganizer } from "@/api/user/user.queries";
 import { toast } from "sonner";
+import { Logo } from "@/components/layout/logo";
 
 // 🧠 ZOD SCHEMA + TYPE
 const registerSchema = z
@@ -55,8 +56,7 @@ export default function RegisterPage() {
   });
 
   const { mutateAsync: registerUser, isPending } = useRegister();
-    const becomeOrganizerMutation = useBecomeOrganizer();
-
+  const becomeOrganizerMutation = useBecomeOrganizer();
 
   const onSubmit = async (data: RegisterForm) => {
     try {
@@ -86,11 +86,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
       {/* Animated BG Circles */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
           animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
@@ -108,12 +108,10 @@ export default function RegisterPage() {
         className="relative z-10 w-full max-w-md"
       >
         <Card className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20">
-          <CardHeader className="text-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-bold text-lg">T</span>
-            </div>
+          <CardHeader className="text-center flex justify-center items-center flex-col space-y-2 p-8">
+            <Logo withText={false} size="sm" />
             <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-            <p className="text-muted-foreground">Join Ticket-er today</p>
+            <p className="text-muted-foreground">Join Ticketer today</p>
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -126,7 +124,7 @@ export default function RegisterPage() {
                     type="button"
                     className={`flex items-center space-x-2 rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300 ${
                       watch("role") === "USER"
-                        ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                        ? "bg-[#1E88E5] hover:bg-blue-500 text-white"
                         : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                     }`}
                     onClick={() => setValue("role", "USER")}
@@ -138,7 +136,7 @@ export default function RegisterPage() {
                     type="button"
                     className={`flex items-center space-x-2 rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300 ${
                       watch("role") === "ORGANIZER"
-                        ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                        ? "bg-[#1E88E5] hover:bg-blue-500 text-white"
                         : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                     }`}
                     onClick={() => setValue("role", "ORGANIZER")}
@@ -246,7 +244,7 @@ export default function RegisterPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                 disabled={isPending}
               >
                 {isPending ? "Creating Account..." : "Create Account"}
@@ -278,3 +276,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

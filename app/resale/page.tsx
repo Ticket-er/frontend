@@ -74,7 +74,7 @@ export default function ResalePage() {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading Resale Tickets...
           </h2>
@@ -119,7 +119,7 @@ export default function ResalePage() {
                 placeholder="Search resale tickets..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="pl-12 h-12 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -169,7 +169,7 @@ export default function ResalePage() {
 
                   {/* Price Badge */}
                   <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 shadow">
-                    <div className="text-sm font-semibold text-purple-600">
+                    <div className="text-sm font-semibold text-blue-600">
                       {formatPrice(resalePrice)}
                     </div>
                     {isDiscounted && (
@@ -230,7 +230,7 @@ export default function ResalePage() {
                         src={ticket.user.profileImage ?? undefined}
                         alt={ticket.user.name}
                       ></AvatarImage>
-                      <AvatarFallback className="bg-purple-100 text-purple-600 text-sm">
+                      <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
                         {ticket.user.profileImage ||
                           ticket?.user.name.charAt(0)}
                       </AvatarFallback>
@@ -269,7 +269,7 @@ export default function ResalePage() {
 
                   <Button
                     onClick={() => handleBuyTicket(ticket)}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full font-semibold transition-all duration-300"
+                    className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full font-semibold transition-all duration-300"
                     disabled={isBuyPending}
                   >
                     {isBuyPending ? "Processing..." : "Buy Now"}
@@ -305,7 +305,7 @@ export default function ResalePage() {
               <Button
                 onClick={() => setSearchQuery("")}
                 variant="outline"
-                className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white rounded-full bg-transparent"
+                className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white rounded-full bg-transparent"
               >
                 Clear Search
               </Button>
@@ -348,8 +348,8 @@ export default function ResalePage() {
             </div>
 
             <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <User className="w-6 h-6 text-blue-600" />
               </div>
               <h4 className="font-semibold text-gray-900 mb-2">
                 Buyer Protection

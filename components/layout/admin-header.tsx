@@ -1,18 +1,26 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { Menu, X, Shield, Users, Calendar, BarChart3, LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Menu,
+  X,
+  Shield,
+  Users,
+  Calendar,
+  BarChart3,
+  LogOut,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export function AdminHeader() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
     // In a real app, this would handle logout logic
-    window.location.href = "/login"
-  }
+    window.location.href = "/login";
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -20,11 +28,11 @@ export function AdminHeader() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/admin/dashboard" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
               <Shield className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-xl bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Ticket-er Admin
+            <span className="font-bold text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Ticketer Admin
             </span>
           </Link>
 
@@ -56,7 +64,7 @@ export function AdminHeader() {
           {/* Desktop Admin Actions */}
           <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <Shield className="h-4 w-4 text-purple-600" />
+              <Shield className="h-4 w-4 text-blue-600" />
               <span className="text-sm font-medium">Admin Portal</span>
             </div>
             <div className="flex items-center space-x-2">
@@ -72,8 +80,17 @@ export function AdminHeader() {
           </div>
 
           {/* Mobile Menu Button */}
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </Button>
         </div>
 
@@ -114,7 +131,7 @@ export function AdminHeader() {
               {/* Mobile Admin Actions */}
               <div className="pt-4 border-t">
                 <div className="flex items-center space-x-2 mb-4">
-                  <Shield className="h-4 w-4 text-purple-600" />
+                  <Shield className="h-4 w-4 text-blue-600" />
                   <span className="text-sm font-medium">Admin Portal</span>
                 </div>
                 <div className="flex space-x-2">
@@ -123,7 +140,12 @@ export function AdminHeader() {
                       Back to Site
                     </Link>
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={handleLogout} className="flex-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleLogout}
+                    className="flex-1"
+                  >
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </Button>
@@ -134,5 +156,6 @@ export function AdminHeader() {
         )}
       </div>
     </header>
-  )
+  );
 }
+

@@ -53,11 +53,11 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
       {/* Animated Background Circles */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
           animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
@@ -85,10 +85,10 @@ export default function ForgotPasswordPage() {
                 whileHover={{ rotate: 180 }}
                 transition={{ duration: 0.3 }}
               >
-                <Sparkles className="w-8 h-8 text-purple-600" />
+                <Sparkles className="w-8 h-8 text-blue-600" />
               </motion.div>
-              <span className="text-2xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
-                Ticket-er
+              <span className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                Ticketer
               </span>
             </Link>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
                   id="email"
                   type="email"
                   {...register("email")}
-                  className="pl-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="pl-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter your email"
                 />
               </div>
@@ -129,7 +129,7 @@ export default function ForgotPasswordPage() {
             <Button
               type="submit"
               disabled={forgotPasswordMutation.isPending}
-              className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+              className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
             >
               {forgotPasswordMutation.isPending ? "Sending..." : "Send OTP"}
             </Button>

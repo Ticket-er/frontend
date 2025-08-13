@@ -1,36 +1,40 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Badge } from "@/components/ui/badge"
-import { Ticket, RefreshCw, BarChart3, CreditCard } from "lucide-react"
+import { motion } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Ticket, RefreshCw, BarChart3, CreditCard } from "lucide-react";
 
 const features = [
   {
     icon: Ticket,
     title: "Buy Tickets Easily",
-    description: "Browse and purchase tickets for your favorite events with just a few clicks.",
+    description:
+      "Browse and purchase tickets for your favorite events with just a few clicks.",
     color: "text-blue-600",
   },
   {
     icon: RefreshCw,
     title: "Resell Tickets Securely",
-    description: "Can't make it? Safely resell your tickets through our verified marketplace.",
+    description:
+      "Can't make it? Safely resell your tickets through our verified marketplace.",
     color: "text-green-600",
     isNew: true,
   },
   {
     icon: BarChart3,
     title: "Organizer Dashboard & Wallet",
-    description: "Comprehensive tools for event management and instant payouts.",
-    color: "text-purple-600",
+    description:
+      "Comprehensive tools for event management and instant payouts.",
+    color: "text-blue-600",
   },
   {
     icon: CreditCard,
     title: "Fast Checkout & Secure Payments",
-    description: "Lightning-fast checkout with bank-level security for all transactions.",
+    description:
+      "Lightning-fast checkout with bank-level security for all transactions.",
     color: "text-orange-600",
   },
-]
+];
 
 export function FeaturesSection() {
   return (
@@ -47,7 +51,8 @@ export function FeaturesSection() {
             Everything you need for events
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            From buying tickets to organizing events, we've got you covered with powerful features.
+            From buying tickets to organizing events, we've got you covered with
+            powerful features.
           </p>
         </motion.div>
 
@@ -61,7 +66,7 @@ export function FeaturesSection() {
               viewport={{ once: true }}
               className="relative group"
             >
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-purple-200 h-full">
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200 h-full">
                 {feature.isNew && (
                   <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white">
                     New ✅
@@ -74,14 +79,19 @@ export function FeaturesSection() {
                   <feature.icon className={`w-6 h-6 ${feature.color}`} />
                 </div>
 
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                  {feature.title}
+                </h3>
 
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                <p className="text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
               </div>
             </motion.div>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
+

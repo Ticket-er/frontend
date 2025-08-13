@@ -79,16 +79,16 @@ export default function WalletPage() {
     if (!searchTerm) return transactions;
     const lowerSearch = searchTerm.toLowerCase();
     return transactions.filter((tx) =>
-      [
-        tx.reference,
-        tx.event?.name,
-        tx.buyer?.name,
-      ].some((field) => field?.toLowerCase().includes(lowerSearch))
+      [tx.reference, tx.event?.name, tx.buyer?.name].some((field) =>
+        field?.toLowerCase().includes(lowerSearch)
+      )
     );
   }, [transactions, searchTerm]);
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredTransactions.length / transactionsPerPage);
+  const totalPages = Math.ceil(
+    filteredTransactions.length / transactionsPerPage
+  );
   const paginatedTransactions = useMemo(() => {
     const start = (currentPage - 1) * transactionsPerPage;
     const end = start + transactionsPerPage;
@@ -140,7 +140,7 @@ export default function WalletPage() {
         className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
       >
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading...
           </h2>
@@ -196,11 +196,12 @@ export default function WalletPage() {
             Wallet Setup
           </h1>
           <p className="text-lg text-gray-600 mb-6 max-w-md">
-            Please set a 4-digit PIN to secure your wallet and enable transactions.
+            Please set a 4-digit PIN to secure your wallet and enable
+            transactions.
           </p>
           <Button
             onClick={() => setIsPinModalOpen(true)}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Set Wallet PIN
           </Button>
@@ -223,7 +224,7 @@ export default function WalletPage() {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading Wallet...
           </h2>
@@ -286,7 +287,7 @@ export default function WalletPage() {
               <Card className="bg-white rounded-xl shadow-lg border border-gray-100">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2 text-gray-900">
-                    <Wallet className="h-5 w-5 text-purple-600" />
+                    <Wallet className="h-5 w-5 text-blue-600" />
                     <span>Available Balance</span>
                   </CardTitle>
                 </CardHeader>
@@ -297,7 +298,7 @@ export default function WalletPage() {
                     </p>
                     <div className="space-y-2">
                       <Button
-                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                         onClick={() => setIsPayoutModalOpen(true)}
                         disabled={(balanceData?.balance || 0) <= 0}
                       >
@@ -326,11 +327,15 @@ export default function WalletPage() {
             >
               <div className="bg-white rounded-xl shadow-lg border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4 h-full p-6">
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600">Total Earned From Resale</p>
+                  <p className="text-sm text-gray-600">
+                    Total Earned From Resale
+                  </p>
                   <p className="text-2xl font-bold text-green-600">
                     {formatPrice(
                       filteredTransactions
-                        .filter((t) => t.type === "RESALE" && t.status === "SUCCESS")
+                        .filter(
+                          (t) => t.type === "RESALE" && t.status === "SUCCESS"
+                        )
                         .reduce((sum, t) => sum + t.amount, 0) || 0
                     )}
                   </p>
@@ -340,7 +345,9 @@ export default function WalletPage() {
                   <p className="text-2xl font-bold text-blue-600">
                     {formatPrice(
                       filteredTransactions
-                        .filter((t) => t.type === "WITHDRAW" && t.status === "SUCCESS")
+                        .filter(
+                          (t) => t.type === "WITHDRAW" && t.status === "SUCCESS"
+                        )
                         .reduce((sum, t) => sum + Math.abs(t.amount), 0) || 0
                     )}
                   </p>
@@ -444,26 +451,31 @@ export default function WalletPage() {
                         Previous
                       </Button>
                       <div className="flex items-center space-x-2">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                          (page) => (
-                            <Button
-                              key={page}
-                              variant={currentPage === page ? "default" : "outline"}
-                              onClick={() => handlePageChange(page)}
-                              className={
-                                currentPage === page
-                                  ? "bg-purple-600 text-white"
-                                  : ""
-                              }
-                            >
-                              {page}
-                            </Button>
-                          )
-                        )}
+                        {Array.from(
+                          { length: totalPages },
+                          (_, i) => i + 1
+                        ).map((page) => (
+                          <Button
+                            key={page}
+                            variant={
+                              currentPage === page ? "default" : "outline"
+                            }
+                            onClick={() => handlePageChange(page)}
+                            className={
+                              currentPage === page
+                                ? "bg-blue-600 text-white"
+                                : ""
+                            }
+                          >
+                            {page}
+                          </Button>
+                        ))}
                       </div>
                       <Button
                         variant="outline"
-                        disabled={currentPage === totalPages || totalPages === 0}
+                        disabled={
+                          currentPage === totalPages || totalPages === 0
+                        }
                         onClick={() => handlePageChange(currentPage + 1)}
                       >
                         Next
@@ -482,7 +494,7 @@ export default function WalletPage() {
                         : "Your transaction history will appear here once your events generate sales."}
                     </p>
                     <Button
-                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       asChild
                     >
                       <Link href="/explore">Explore Events</Link>
@@ -513,3 +525,4 @@ export default function WalletPage() {
     </div>
   );
 }
+

@@ -108,15 +108,14 @@ export default function VerifyOTPPage() {
         localStorage.removeItem("otpPayload");
         setSecondsLeft(60);
       },
-
     });
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-purple-950/20 dark:via-pink-950/20 dark:to-orange-950/20 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-pink-50 to-orange-50 dark:from-blue-950/20 dark:via-pink-950/20 dark:to-orange-950/20 p-4">
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
           animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
@@ -136,10 +135,10 @@ export default function VerifyOTPPage() {
         <Card className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/20">
           <CardHeader className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-blue-600 to-pink-600 flex items-center justify-center">
                 <span className="text-white font-bold text-sm">T</span>
               </div>
-              <span className="font-bold text-xl">Ticket-er</span>
+              <span className="font-bold text-xl">Ticketer</span>
             </div>
             <CardTitle className="text-2xl">Verify Your Email</CardTitle>
             <p className="text-muted-foreground">
@@ -172,7 +171,7 @@ export default function VerifyOTPPage() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+                className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
                 disabled={otp.length < 6 || isPending}
               >
                 {isPending ? "Verifying..." : "Verify Code"}
@@ -184,7 +183,7 @@ export default function VerifyOTPPage() {
                   <button
                     disabled={isResending || secondsLeft > 0}
                     onClick={handleResend}
-                    className="text-purple-600 hover:underline disabled:opacity-50"
+                    className="text-blue-600 hover:underline disabled:opacity-50"
                   >
                     Resend Code
                   </button>
@@ -209,3 +208,4 @@ export default function VerifyOTPPage() {
     </div>
   );
 }
+
