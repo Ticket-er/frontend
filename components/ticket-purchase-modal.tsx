@@ -187,7 +187,7 @@ export function TicketPurchaseModal({
 
                   <Button
                     onClick={handleContinue}
-                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl"
+                    className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl"
                   >
                     Continue to Checkout
                   </Button>
@@ -215,7 +215,7 @@ export function TicketPurchaseModal({
                   <div className="space-y-3">
                     <Button
                       onClick={() => (window.location.href = "/login")}
-                      className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl"
+                      className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl"
                     >
                       Sign In
                     </Button>
@@ -269,7 +269,7 @@ export function TicketPurchaseModal({
                   <Button
                     onClick={handlePurchase}
                     disabled={isBuying}
-                    className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl"
+                    className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl"
                   >
                     {isBuying ? "Processing..." : "Complete Purchase"}
                   </Button>
@@ -306,7 +306,7 @@ export function TicketPurchaseModal({
                   <div className="space-y-3">
                     <Button
                       onClick={() => (window.location.href = "/my-tickets")}
-                      className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl"
+                      className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl"
                     >
                       View My Tickets
                     </Button>

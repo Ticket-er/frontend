@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Logo } from "./layout/logo";
 
 export function HeroSection() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export function HeroSection() {
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
           animate={{
             x: [0, 100, 0],
             y: [0, -100, 0],
@@ -56,10 +57,7 @@ export function HeroSection() {
           transition={{ duration: 0.8 }}
           className="flex items-center justify-center mb-6"
         >
-          <Sparkles className="w-8 h-8 text-purple-600 mr-3" />
-          <span className="text-lg font-semibold text-purple-600">
-            Ticket-er
-          </span>
+          <Logo size="sm" />
         </motion.div>
 
         <motion.h1
@@ -69,7 +67,7 @@ export function HeroSection() {
           className="text-4xl sm:text-5xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight"
         >
           Buy. Sell. Enjoy Events{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-600">
             Effortlessly.
           </span>
         </motion.h1>
@@ -92,7 +90,7 @@ export function HeroSection() {
           <Button
             size="lg"
             onClick={() => router.push("/explore")}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-[#1E88E5] hover:bg-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Explore Events
             <ArrowRight className="ml-2 w-5 h-5" />
@@ -101,7 +99,7 @@ export function HeroSection() {
             variant="outline"
             size="lg"
             onClick={() => router.push("/register")}
-            className="border-2 border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 bg-transparent"
+            className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 bg-transparent"
           >
             Become an Organizer
           </Button>

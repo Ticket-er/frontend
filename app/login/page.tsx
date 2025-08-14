@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
 import { useLogin } from "@/api/auth/auth.queries";
+import { Logo } from "@/components/layout/logo";
 
 // 🧠 Zod Schema
 const loginSchema = z.object({
@@ -45,11 +46,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-16">
       {/* Animated BG Circles */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
           animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
@@ -73,15 +74,7 @@ export default function LoginPage() {
               href="/"
               className="inline-flex items-center space-x-2 mb-6 group"
             >
-              <motion.div
-                whileHover={{ rotate: 180 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Sparkles className="w-8 h-8 text-purple-600" />
-              </motion.div>
-              <span className="text-2xl font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
-                Ticket-er
-              </span>
+              <Logo size="sm" />
             </Link>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back
@@ -104,7 +97,7 @@ export default function LoginPage() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  className="pl-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="pl-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   {...register("email")}
                 />
               </div>
@@ -128,7 +121,7 @@ export default function LoginPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  className="pl-10 pr-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="pl-10 pr-10 h-12 bg-white/50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   {...register("password")}
                 />
                 <button
@@ -154,13 +147,13 @@ export default function LoginPage() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </label>
               <Link
                 href="/forgot-password"
-                className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
               >
                 Forgot password?
               </Link>
@@ -169,7 +162,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+              className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
             >
               {loginMutation.isPending ? "Signing in..." : "Sign in"}
             </Button>
@@ -179,7 +172,7 @@ export default function LoginPage() {
             Don't have an account?{" "}
             <Link
               href="/register"
-              className="text-purple-600 hover:text-purple-700 font-medium"
+              className="text-blue-600 hover:text-blue-700 font-medium"
             >
               Sign up
             </Link>

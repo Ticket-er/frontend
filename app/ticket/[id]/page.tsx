@@ -104,7 +104,7 @@ export default function TicketDetailPage({
           </p>
           <Button
             asChild
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <Link href="/my-tickets">Back to My Tickets</Link>
           </Button>
@@ -120,7 +120,7 @@ export default function TicketDetailPage({
           <Button
             variant="ghost"
             asChild
-            className="text-gray-700 hover:text-purple-600"
+            className="text-gray-700 hover:text-blue-600"
           >
             <Link href="/my-tickets">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -241,7 +241,7 @@ export default function TicketDetailPage({
                     {!ticket.isUsed && (
                       <div className="space-y-3">
                         <Button
-                          className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                          className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                           onClick={handleListForResale}
                           disabled={ticket.isListed || isResalePending}
                         >
@@ -278,3 +278,4 @@ export default function TicketDetailPage({
     </div>
   );
 }
+

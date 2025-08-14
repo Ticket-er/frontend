@@ -1,73 +1,83 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { useSearchParams } from "next/navigation"
-import { CheckCircle, XCircle, AlertCircle, Calendar, MapPin, User } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { parseTicketData, type QRTicketData } from "@/lib/qr-utils"
-import { Header } from "@/components/layout/header"
-import { useVerifyTicket } from "@/api/tickets/tickets.queries"
-import { useAuth } from "@/lib/auth-context"
-import { formatDate, formatPrice } from "@/lib/dummy-data"
-import { toast } from "sonner"
-import { Ticket } from "@/types/tickets.type"
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
+import {
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Calendar,
+  MapPin,
+  User,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { parseTicketData, type QRTicketData } from "@/lib/qr-utils";
+import { Header } from "@/components/layout/header";
+import { useVerifyTicket } from "@/api/tickets/tickets.queries";
+import { useAuth } from "@/lib/auth-context";
+import { formatDate, formatPrice } from "@/lib/dummy-data";
+import { toast } from "sonner";
+import { Ticket } from "@/types/tickets.type";
 
 interface TicketVerification {
-  isValid: boolean
-  ticket?: Ticket
-  scannedAt?: string
+  isValid: boolean;
+  ticket?: Ticket;
+  scannedAt?: string;
 }
 
 export default function VerifyTicketPage() {
-  const searchParams = useSearchParams()
-  const { user } = useAuth()
-  const { mutateAsync: verifyTicket, isPending: isVerifying } = useVerifyTicket()
-  const [verification, setVerification] = useState<TicketVerification | null>(null)
-  const [ticketData, setTicketData] = useState<QRTicketData | null>(null)
-  const [error, setError] = useState<string>("")
+  const searchParams = useSearchParams();
+  const { user } = useAuth();
+  const { mutateAsync: verifyTicket, isPending: isVerifying } =
+    useVerifyTicket();
+  const [verification, setVerification] = useState<TicketVerification | null>(
+    null
+  );
+  const [ticketData, setTicketData] = useState<QRTicketData | null>(null);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const verify = async () => {
       try {
-        setError("")
-        const dataParam = searchParams.get("data")
+        setError("");
+        const dataParam = searchParams.get("data");
         if (!dataParam) {
-          setError("Invalid verification link")
-          return
+          setError("Invalid verification link");
+          return;
         }
 
-        const parsedData = parseTicketData(dataParam)
+        const parsedData = parseTicketData(dataParam);
         if (!parsedData || !parsedData.eventId) {
-          setError("Invalid ticket data")
-          return
+          setError("Invalid ticket data");
+          return;
         }
 
-        setTicketData(parsedData)
+        setTicketData(parsedData);
 
         const response = await verifyTicket({
           ticketId: parsedData.ticketId,
           code: parsedData.code,
           eventId: parsedData.eventId,
-        })
+        });
 
         setVerification({
           isValid: response.isValid,
           ticket: response.ticket,
           scannedAt: new Date().toISOString(),
-        })
+        });
       } catch (err: any) {
-        setError(err?.message || "Verification failed. Please try again.")
+        setError(err?.message || "Verification failed. Please try again.");
       }
-    }
+    };
 
-    verify()
-  }, [searchParams, verifyTicket])
+    verify();
+  }, [searchParams, verifyTicket]);
 
-  const ticket = verification?.ticket
-  const event = ticket?.event
+  const ticket = verification?.ticket;
+  const event = ticket?.event;
 
   if (isVerifying) {
     return (
@@ -78,12 +88,16 @@ export default function VerifyTicketPage() {
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Verifying Ticket...</h2>
-          <p className="text-gray-600">Please wait while we validate your ticket</p>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Verifying Ticket...
+          </h2>
+          <p className="text-gray-600">
+            Please wait while we validate your ticket
+          </p>
         </motion.div>
       </div>
-    )
+    );
   }
 
   if (error || !ticketData) {
@@ -98,7 +112,9 @@ export default function VerifyTicketPage() {
           <Card className="bg-white border-red-200 shadow-lg rounded-xl">
             <CardHeader className="text-center">
               <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-              <CardTitle className="text-red-600">Verification Failed</CardTitle>
+              <CardTitle className="text-red-600">
+                Verification Failed
+              </CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-gray-600">{error || "Invalid ticket data"}</p>
@@ -113,27 +129,43 @@ export default function VerifyTicketPage() {
           </Card>
         </motion.div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <Header />
       <div className="container mx-auto max-w-2xl py-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <Card className={`bg-white shadow-lg rounded-xl ${verification?.isValid ? "border-green-200" : "border-red-200"}`}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Card
+            className={`bg-white shadow-lg rounded-xl ${
+              verification?.isValid ? "border-green-200" : "border-red-200"
+            }`}
+          >
             <CardHeader className="text-center">
               {verification?.isValid ? (
                 <>
                   <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                  <CardTitle className="text-green-600">Ticket Valid ✓</CardTitle>
-                  <p className="text-gray-600">This ticket has been successfully verified</p>
+                  <CardTitle className="text-green-600">
+                    Ticket Valid ✓
+                  </CardTitle>
+                  <p className="text-gray-600">
+                    This ticket has been successfully verified
+                  </p>
                 </>
               ) : (
                 <>
                   <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-                  <CardTitle className="text-red-600">Invalid Ticket ✗</CardTitle>
-                  <p className="text-gray-600">This ticket could not be verified</p>
+                  <CardTitle className="text-red-600">
+                    Invalid Ticket ✗
+                  </CardTitle>
+                  <p className="text-gray-600">
+                    This ticket could not be verified
+                  </p>
                 </>
               )}
             </CardHeader>
@@ -148,21 +180,31 @@ export default function VerifyTicketPage() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Ticket Code:</span>
-                    <p className="font-mono text-gray-900">{ticketData.code || ticket?.code || "N/A"}</p>
+                    <p className="font-mono text-gray-900">
+                      {ticketData.code || ticket?.code || "N/A"}
+                    </p>
                   </div>
                   <div>
                     <span className="text-gray-600">Event ID:</span>
-                    <p className="font-mono text-gray-900">{ticketData.eventId}</p>
+                    <p className="font-mono text-gray-900">
+                      {ticketData.eventId}
+                    </p>
                   </div>
                   <div>
                     <span className="text-gray-600">Scanned At:</span>
                     <p className="text-gray-900">
-                      {verification?.scannedAt ? new Date(verification.scannedAt).toLocaleString() : "N/A"}
+                      {verification?.scannedAt
+                        ? new Date(verification.scannedAt).toLocaleString()
+                        : "N/A"}
                     </p>
                   </div>
                   <div>
                     <span className="text-gray-600">Status:</span>
-                    <Badge variant={verification?.isValid ? "default" : "destructive"}>
+                    <Badge
+                      variant={
+                        verification?.isValid ? "default" : "destructive"
+                      }
+                    >
                       {verification?.isValid ? "Valid" : "Invalid"}
                     </Badge>
                   </div>
@@ -172,7 +214,9 @@ export default function VerifyTicketPage() {
               {/* Event Details */}
               {event && (
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900">Event Information</h3>
+                  <h3 className="font-semibold text-gray-900">
+                    Event Information
+                  </h3>
                   <div className="flex items-start space-x-4">
                     <img
                       src={event.bannerUrl || "/placeholder.svg"}
@@ -180,7 +224,9 @@ export default function VerifyTicketPage() {
                       className="w-20 h-20 rounded-lg object-cover"
                     />
                     <div className="flex-1 space-y-2">
-                      <h4 className="font-semibold text-lg text-gray-900">{event.name}</h4>
+                      <h4 className="font-semibold text-lg text-gray-900">
+                        {event.name}
+                      </h4>
                       <div className="space-y-1 text-sm text-gray-600">
                         <div className="flex items-center space-x-2">
                           <Calendar className="h-4 w-4 text-gray-500" />
@@ -199,22 +245,40 @@ export default function VerifyTicketPage() {
               {/* Ticket Details */}
               {ticket && (
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900">Ticket Information</h3>
+                  <h3 className="font-semibold text-gray-900">
+                    Ticket Information
+                  </h3>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-gray-600">Original Price:</span>
-                      <p className="font-semibold text-gray-900">₦{formatPrice(event?.price || 0)}</p>
+                      <p className="font-semibold text-gray-900">
+                        ₦{formatPrice(event?.price || 0)}
+                      </p>
                     </div>
                     <div>
                       <span className="text-gray-600">Ticket Status:</span>
-                      <Badge variant={ticket.isUsed ? "secondary" : ticket.isListed ? "destructive" : "default"}>
-                        {ticket.isUsed ? "Used" : ticket.isListed ? "Listed for Resale" : "Active"}
+                      <Badge
+                        variant={
+                          ticket.isUsed
+                            ? "secondary"
+                            : ticket.isListed
+                            ? "destructive"
+                            : "default"
+                        }
+                      >
+                        {ticket.isUsed
+                          ? "Used"
+                          : ticket.isListed
+                          ? "Listed for Resale"
+                          : "Active"}
                       </Badge>
                     </div>
                     {ticket.isListed && ticket.resalePrice && (
                       <div>
                         <span className="text-gray-600">Listed for:</span>
-                        <p className="font-semibold text-orange-600">₦{formatPrice(ticket.resalePrice)}</p>
+                        <p className="font-semibold text-orange-600">
+                          ₦{formatPrice(ticket.resalePrice)}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -226,7 +290,7 @@ export default function VerifyTicketPage() {
                 {verification?.isValid && user?.role === "ORGANIZER" ? (
                   <>
                     <Button
-                      className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       onClick={() => window.print()}
                     >
                       Print Verification
@@ -257,7 +321,9 @@ export default function VerifyTicketPage() {
                   <div className="text-sm text-blue-800">
                     <p className="font-medium">Security Notice</p>
                     <p>
-                      This verification was performed at {new Date().toLocaleString()}. Each ticket can only be used once for entry.
+                      This verification was performed at{" "}
+                      {new Date().toLocaleString()}. Each ticket can only be
+                      used once for entry.
                     </p>
                   </div>
                 </div>
@@ -267,5 +333,6 @@ export default function VerifyTicketPage() {
         </motion.div>
       </div>
     </div>
-  )
+  );
 }
+

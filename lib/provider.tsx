@@ -22,7 +22,7 @@ export default function Providers({ children }: { children: ReactNode }) {
               success: "bg-green-50 text-green-800 border-green-200",
               error: "bg-red-50 text-red-800 border-red-200",
               actionButton:
-                "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-4 py-1",
+                "bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-4 py-1",
               cancelButton: "bg-gray-100 text-gray-900 rounded-full px-4 py-1",
             },
           }}

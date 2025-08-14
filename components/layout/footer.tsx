@@ -1,10 +1,19 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Facebook,
+  Twitter,
+  Instagram,
+  Youtube,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Logo } from "./logo";
 
 export function Footer() {
   return (
@@ -13,19 +22,23 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">T</span>
-              </div>
-              <span className="font-bold text-xl text-foreground">Ticket-er</span>
-            </div>
-            <p className="text-muted-foreground">
-              Your gateway to unforgettable experiences. Discover and book amazing events worldwide.
+            <Logo />
+            <p className="text-muted-[#1E88E5]">
+              Your gateway to unforgettable experiences. Discover and book
+              amazing events worldwide.
             </p>
             <div className="flex space-x-4">
               {[Facebook, Twitter, Instagram, Youtube].map((Icon, index) => (
-                <motion.div key={index} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                  <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary">
+                <motion.div
+                  key={index}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-[#1E88E5] hover:text-primary"
+                  >
                     <Icon className="h-5 w-5" />
                   </Button>
                 </motion.div>
@@ -35,7 +48,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Quick Links</h3>
+            <h3 className="font-semibold text-[#1E88E5]">Quick Links</h3>
             <div className="space-y-2">
               {[
                 { href: "/explore", label: "Explore Events" },
@@ -46,7 +59,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block text-muted-foreground hover:text-primary transition-colors"
+                  className="block text-muted-[#1E88E5] hover:text-primary transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -56,7 +69,7 @@ export function Footer() {
 
           {/* Support */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Support</h3>
+            <h3 className="font-semibold text-[#1E88E5]">Support</h3>
             <div className="space-y-2">
               {[
                 { href: "/help", label: "Help Center" },
@@ -67,7 +80,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block text-muted-foreground hover:text-primary transition-colors"
+                  className="block text-muted-[#1E88E5] hover:text-primary transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -77,17 +90,17 @@ export function Footer() {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Contact Info</h3>
+            <h3 className="font-semibold text-[#1E88E5]">Contact Info</h3>
             <div className="space-y-3">
-              <div className="flex items-center space-x-2 text-muted-foreground">
+              <div className="flex items-center space-x-2 text-muted-[#1E88E5]">
                 <Mail className="h-4 w-4" />
-                <span className="text-sm">support@ticketer.com</span>
+                <span className="text-sm">support@ticketer.africa</span>
               </div>
-              <div className="flex items-center space-x-2 text-muted-foreground">
+              <div className="flex items-center space-x-2 text-muted-[#1E88E5]">
                 <Phone className="h-4 w-4" />
                 <span className="text-sm">+1 (555) 123-4567</span>
               </div>
-              <div className="flex items-center space-x-2 text-muted-foreground">
+              <div className="flex items-center space-x-2 text-muted-[#1E88E5]">
                 <MapPin className="h-4 w-4" />
                 <span className="text-sm">New York, NY</span>
               </div>
@@ -96,12 +109,17 @@ export function Footer() {
         </div>
 
         <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-muted-foreground text-sm">© 2024 Ticket-er. All rights reserved.</p>
+          <p className="text-muted-[#1E88E5] text-sm">
+            © {new Date().getFullYear()} Ticketer. All rights reserved.
+          </p>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            <span className="text-sm text-muted-foreground">Stay updated:</span>
+            <span className="text-sm text-muted-[#1E88E5]">Stay updated:</span>
             <div className="flex space-x-2">
               <Input placeholder="Enter email" className="w-40" />
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button
+                size="sm"
+                className="bg-primary hover:bg-primary/90 text-primary-[#1E88E5]"
+              >
                 Subscribe
               </Button>
             </div>
@@ -109,5 +127,6 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }
+

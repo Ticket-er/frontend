@@ -153,7 +153,7 @@ export default function CreateEventPage() {
         className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
       >
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading Authentication...
           </h2>
@@ -167,7 +167,7 @@ export default function CreateEventPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -184,13 +184,13 @@ export default function CreateEventPage() {
           </p>
           <div className="space-y-3">
             <Button
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
               asChild
             >
               <Link href="/organizer">Go to Dashboard</Link>
             </Button>
             <Button
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
               onClick={handleCreateAnother}
             >
               Create Another Event
@@ -202,7 +202,7 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <Button variant="outline" className="bg-transparent" asChild>
@@ -226,7 +226,7 @@ export default function CreateEventPage() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     step <= currentStep
-                      ? "bg-purple-600 text-white"
+                      ? "bg-blue-600 text-white"
                       : "bg-gray-200 text-gray-600"
                   }`}
                 >
@@ -235,7 +235,7 @@ export default function CreateEventPage() {
                 {step < 3 && (
                   <div
                     className={`w-16 h-1 mx-2 ${
-                      step < currentStep ? "bg-purple-600" : "bg-gray-200"
+                      step < currentStep ? "bg-blue-600" : "bg-gray-200"
                     }`}
                   />
                 )}
@@ -314,7 +314,7 @@ export default function CreateEventPage() {
                             onClick={() => setValue("category", category)}
                             className={
                               watch("category") === category
-                                ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                                ? "bg-[#1E88E5] hover:bg-blue-500 text-white"
                                 : "bg-transparent"
                             }
                           >
@@ -592,7 +592,7 @@ export default function CreateEventPage() {
 
                   {currentStep < 3 ? (
                     <Button
-                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       onClick={handleNext}
                       disabled={
                         currentStep === 1 ? !canProceedStep1 : !canProceedStep2
@@ -605,7 +605,7 @@ export default function CreateEventPage() {
                     <Button
                       type="submit"
                       form="create-event-form"
-                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       disabled={isPending}
                     >
                       {isPending ? "Creating..." : "Create Event"}

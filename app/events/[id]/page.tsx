@@ -33,11 +33,15 @@ export default function EventPage({ params }: { params: { id: string } }) {
   const { data: myTickets = [] } = useMyTickets();
   const { data: resaleTickets = [] } = useResaleListings(params.id);
 
-  const eventTickets = myTickets.filter((ticket) => ticket.eventId === params.id);
+  const eventTickets = myTickets.filter(
+    (ticket) => ticket.eventId === params.id
+  );
 
   const handleBuyTicket = (ticket: TicketResale) => {
     if (!user) {
-      window.location.href = `/login?returnUrl=${encodeURIComponent(window.location.href)}`;
+      window.location.href = `/login?returnUrl=${encodeURIComponent(
+        window.location.href
+      )}`;
       return;
     }
     setSelectedResaleTicket(ticket);
@@ -51,7 +55,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center space-y-4">
-          <div className="w-10 h-10 border-4 border-t-transparent border-purple-600 rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-t-transparent border-blue-600 rounded-full animate-spin" />
           <p className="text-gray-600">Loading event details...</p>
         </div>
       </div>
@@ -70,7 +74,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
             The event you're looking for doesn't exist.
           </p>
           <Link href="/events">
-            <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full">
+            <Button className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full">
               Browse Events
             </Button>
           </Link>
@@ -184,9 +188,7 @@ export default function EventPage({ params }: { params: { id: string } }) {
                             <Shield className="h-4 w-4 text-green-500" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-600">
-                          Event Organizer
-                        </p>
+                        <p className="text-sm text-gray-600">Event Organizer</p>
                       </div>
                     </div>
                   </CardContent>
@@ -230,7 +232,8 @@ export default function EventPage({ params }: { params: { id: string } }) {
                             </div>
                             <div className="text-right">
                               <p className="font-semibold text-lg">
-                                {ticket.resalePrice && formatPrice(ticket?.resalePrice)}
+                                {ticket.resalePrice &&
+                                  formatPrice(ticket?.resalePrice)}
                               </p>
                               <Button
                                 size="sm"
@@ -280,19 +283,21 @@ export default function EventPage({ params }: { params: { id: string } }) {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full"
+                        className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"
                         style={{
                           width: `${(event.minted / event.maxTickets) * 100}%`,
                         }}
                       />
                     </div>
                     <Button
-                      className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full"
+                      className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full"
                       size="lg"
                       disabled={ticketsAvailable === 0}
                       onClick={() => {
                         if (!user) {
-                          window.location.href = `/login?returnUrl=${encodeURIComponent(window.location.href)}`;
+                          window.location.href = `/login?returnUrl=${encodeURIComponent(
+                            window.location.href
+                          )}`;
                           return;
                         }
                         setSelectedResaleTicket(null);
@@ -343,3 +348,4 @@ export default function EventPage({ params }: { params: { id: string } }) {
     </div>
   );
 }
+

@@ -127,7 +127,7 @@ export default function MyTicketsPage() {
         className="fixed inset-0 bg-gray-50 bg-opacity-90 flex items-center justify-center z-50"
       >
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Loading Authentication...
           </h2>
@@ -140,11 +140,11 @@ export default function MyTicketsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       {/* Animated BG Circles */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
           animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
@@ -191,7 +191,7 @@ export default function MyTicketsPage() {
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <Link href={`/events/${eventId}`}>
-                              <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2 hover:text-purple-600 transition-colors">
+                              <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors">
                                 {event.name}
                               </CardTitle>
                             </Link>
@@ -242,7 +242,7 @@ export default function MyTicketsPage() {
                         </div>
 
                         <Button
-                          className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                          className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                           onClick={(e) => toggleEventExpansion(eventId, e)}
                         >
                           {expandedEvent === eventId ? (
@@ -286,7 +286,7 @@ export default function MyTicketsPage() {
                                   </div>
                                   {!ticket.isListed && !ticket.isUsed && (
                                     <Button
-                                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                                      className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                                       onClick={(e) =>
                                         handleListForResale(ticket, e)
                                       }
@@ -296,7 +296,7 @@ export default function MyTicketsPage() {
                                   )}
                                   {ticket.isListed && (
                                     <Button
-                                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                                      className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                                       disabled
                                     >
                                       Listed for ₦
@@ -327,7 +327,7 @@ export default function MyTicketsPage() {
               </p>
               <Button
                 asChild
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <Link href="/explore">Explore Events</Link>
               </Button>

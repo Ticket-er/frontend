@@ -276,7 +276,7 @@ export function PayoutModal({
                 Cancel
               </Button>
               <Button
-                className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={handleDetailsSubmit}
                 disabled={isPending}
               >
@@ -338,7 +338,7 @@ export function PayoutModal({
                 Back
               </Button>
               <Button
-                className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="flex-1 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                 onClick={handlePinSubmit}
                 disabled={isPending || !formData.pin}
               >

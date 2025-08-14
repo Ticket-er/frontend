@@ -36,7 +36,7 @@ const benefits = [
 ];
 
 export function WhyChooseSection() {
-  const router = useRouter()
+  const router = useRouter();
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
       <div className="max-w-7xl mx-auto">
@@ -48,7 +48,7 @@ export function WhyChooseSection() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-            Why Choose Ticket-er?
+            Why Choose Ticketer?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             We're not just another ticketing platform. We're your trusted
@@ -90,13 +90,13 @@ export function WhyChooseSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
           viewport={{ once: true }}
-          className="mt-16 text-center bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-12 text-white"
+          className="mt-16 text-center bg-gradient-to-r from-blue-600 to-blue-600 rounded-3xl p-12 text-white"
         >
           <h3 className="text-2xl sm:text-3xl font-bold mb-4">
             Ready to get started?
           </h3>
           <p className="text-lg mb-8 opacity-90">
-            Join thousands of happy customers who trust Ticket-er for their
+            Join thousands of happy customers who trust Ticketer for their
             events.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -104,14 +104,14 @@ export function WhyChooseSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => router.push("/events")}
-              className="bg-white text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
+              className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >
               Start Exploring
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-purple-600 transition-colors"
+              className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors"
             >
               Learn More
             </motion.button>

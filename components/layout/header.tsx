@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
+import { Logo } from "./logo";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -84,12 +85,12 @@ export function Header() {
       {/* Animated BG Circles */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
           animate={{ x: [0, 100, 0], y: [0, -100, 0] }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
         />
         <motion.div
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
+          className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30"
           animate={{ x: [0, -100, 0], y: [0, 100, 0] }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
         />
@@ -99,10 +100,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">T</span>
-            </div>
-            <span className="text-2xl font-bold text-gray-900">Ticket-er</span>
+            <Logo size="md" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -113,8 +111,8 @@ export function Header() {
                 href={item.href}
                 className={`text-sm font-semibold transition-colors ${
                   isActive(item.href)
-                    ? "text-purple-600 border-b-2 border-purple-600"
-                    : "text-gray-700 hover:text-purple-600"
+                    ? "text-blue-600 border-b-2 border-blue-600"
+                    : "text-gray-700 hover:text-blue-600"
                 }`}
               >
                 {item.name}
@@ -191,13 +189,13 @@ export function Header() {
               <div className="flex items-center space-x-2">
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:text-purple-600"
+                  className="text-gray-700 hover:text-blue-600"
                   asChild
                 >
                   <Link href="/login">Sign In</Link>
                 </Button>
                 <Button
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                   asChild
                 >
                   <Link href="/register">Sign Up</Link>
@@ -237,8 +235,8 @@ export function Header() {
                   href={item.href}
                   className={`block px-4 py-3 text-sm font-semibold rounded-lg transition-colors ${
                     isActive(item.href)
-                      ? "bg-purple-50 text-purple-600"
-                      : "text-gray-700 hover:bg-gray-50 hover:text-purple-600"
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -272,7 +270,7 @@ export function Header() {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-purple-600 rounded-lg transition-colors"
+                      className="flex items-center px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       <item.icon className="h-4 w-4 mr-3 text-gray-500" />
@@ -281,7 +279,7 @@ export function Header() {
                   ))}
                   <button
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-purple-600 rounded-lg transition-colors"
+                    className="flex items-center w-full px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors"
                   >
                     <LogOut className="h-4 w-4 mr-3 text-gray-500" />
                     Sign Out
@@ -292,14 +290,14 @@ export function Header() {
                   <hr className="my-2 border-gray-100" />
                   <Link
                     href="/login"
-                    className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-purple-600 rounded-lg transition-colors"
+                    className="block px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-blue-600 rounded-lg transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In
                   </Link>
                   <Link
                     href="/register"
-                    className="block px-4 py-3 text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="block px-4 py-3 text-sm font-semibold bg-[#1E88E5] hover:bg-blue-500 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Sign Up
@@ -313,3 +311,4 @@ export function Header() {
     </header>
   );
 }
+

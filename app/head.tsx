@@ -20,13 +20,13 @@ export default function Head() {
         content="Discover and book tickets for amazing events"
       />
       <meta property="og:image" content="/og-image.png" />
-      <meta property="og:url" content="https://ticket-er.com" />
+      <meta property="og:url" content="https://ticketer.com" />
       <meta property="og:type" content="website" />
 
       <meta name="twitter:card" content="summary_large_image" />
       <meta
         name="twitter:title"
-        content="Ticket-er - Event Ticketing Platform"
+        content="Ticketer - Event Ticketing Platform"
       />
       <meta
         name="twitter:description"

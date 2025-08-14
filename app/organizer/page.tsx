@@ -27,10 +27,7 @@ export default function OrganizerDashboard() {
       );
       return;
     }
-    if (
-      currentUser &&
-      !["ORGANIZER"].includes(currentUser.role)
-    ) {
+    if (currentUser && !["ORGANIZER"].includes(currentUser.role)) {
       router.push("/explore");
       return;
     }
@@ -89,7 +86,7 @@ export default function OrganizerDashboard() {
             </div>
             <Button
               asChild
-              className="mt-4 sm:mt-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="mt-4 sm:mt-0 bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <Link href="/organizer/create-event">
                 <Plus className="h-4 w-4 mr-2" />
@@ -211,7 +208,7 @@ export default function OrganizerDashboard() {
                         <div className="text-right">
                           <div className="w-full bg-muted rounded-full h-2 mb-2">
                             <div
-                              className="bg-gradient-to-r from-purple-600 to-pink-600 h-2 rounded-full"
+                              className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"
                               style={{
                                 width: `${
                                   (event.minted / event.maxTickets) * 100

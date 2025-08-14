@@ -70,7 +70,7 @@ export default function EventsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div
@@ -103,7 +103,7 @@ export default function EventsPage() {
                 placeholder="Search events, locations..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 h-12 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="pl-12 h-12 bg-gray-50 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -143,7 +143,7 @@ export default function EventsPage() {
                   <select
                     value={selectedLocation}
                     onChange={(e) => setSelectedLocation(e.target.value)}
-                    className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">All locations</option>
                     {locations.map((location) => (
@@ -161,7 +161,7 @@ export default function EventsPage() {
                   <select
                     value={priceRange}
                     onChange={(e) => setPriceRange(e.target.value)}
-                    className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">All prices</option>
                     {priceRanges.map((range) => (
@@ -196,7 +196,7 @@ export default function EventsPage() {
                       height={250}
                       className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                     />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-purple-600">
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
                       {formatPrice(event.price)}
                     </div>
                     {event.minted / event.maxTickets > 0.8 && (
@@ -209,7 +209,7 @@ export default function EventsPage() {
                   </div>
 
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors line-clamp-2">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
                       {event.name}
                     </h3>
 
@@ -237,7 +237,7 @@ export default function EventsPage() {
                     <div className="flex items-center justify-center w-full">
                       <Button
                         size="lg"
-                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full font-semibold"
+                        className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full font-semibold"
                       >
                         View Details
                       </Button>
@@ -269,7 +269,7 @@ export default function EventsPage() {
                 setPriceRange("");
               }}
               variant="outline"
-              className="border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white rounded-full bg-transparent"
+              className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white rounded-full bg-transparent"
             >
               Clear Filters
             </Button>
