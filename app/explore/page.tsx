@@ -22,6 +22,7 @@ export default function EventsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [priceRange, setPriceRange] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const { data: events } = useAllEvents();
 
@@ -32,11 +33,29 @@ export default function EventsPage() {
         .filter(Boolean)
     ),
   ];
+
   const priceRanges = [
     { label: "Under N5000", value: "0-5000" },
     { label: "N5000 - N10000", value: "5000-10000" },
     { label: "N10000 - N20000", value: "10000-20000" },
     { label: "Over N20000", value: "20000" },
+  ];
+
+  const categories = [
+    "Music",
+    "Concert",
+    "Conference",
+    "Workshop",
+    "Sports",
+    "Comedy",
+    "Theatre",
+    "Festival",
+    "Exhibition",
+    "Religion",
+    "Networking",
+    "Tech",
+    "Fashion",
+    "Party",
   ];
 
   const filteredEvents = events?.filter((event: Event) => {
@@ -47,26 +66,30 @@ export default function EventsPage() {
     const matchesLocation =
       !selectedLocation || event.location?.includes(selectedLocation);
 
+    const matchesCategory =
+      !selectedCategory ||
+      event.category?.toLowerCase() === selectedCategory.toLowerCase();
+
     let matchesPrice = true;
     if (priceRange) {
       const price = event.price / 100;
       switch (priceRange) {
-        case "0-50":
+        case "0-5000":
           matchesPrice = price < 50;
           break;
-        case "50-100":
+        case "5000-10000":
           matchesPrice = price >= 50 && price < 100;
           break;
-        case "100-200":
+        case "10000-20000":
           matchesPrice = price >= 100 && price < 200;
           break;
-        case "200+":
+        case "20000+":
           matchesPrice = price >= 200;
           break;
       }
     }
 
-    return matchesSearch && matchesLocation && matchesPrice;
+    return matchesSearch && matchesLocation && matchesCategory && matchesPrice;
   });
 
   return (
@@ -116,9 +139,13 @@ export default function EventsPage() {
               >
                 <SlidersHorizontal className="w-4 h-4" />
                 <span>Filters</span>
-                {(selectedLocation || priceRange) && (
+                {(selectedLocation || priceRange || selectedCategory) && (
                   <Badge variant="secondary" className="ml-2">
-                    {[selectedLocation, priceRange].filter(Boolean).length}
+                    {
+                      [selectedLocation, priceRange, selectedCategory].filter(
+                        Boolean
+                      ).length
+                    }
                   </Badge>
                 )}
               </Button>
@@ -134,7 +161,7 @@ export default function EventsPage() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 transition={{ duration: 0.3 }}
-                className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-4"
+                className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-4"
               >
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -171,6 +198,24 @@ export default function EventsPage() {
                     ))}
                   </select>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category
+                  </label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">All categories</option>
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </motion.div>
             )}
           </div>
@@ -198,6 +243,9 @@ export default function EventsPage() {
                     />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
                       {formatPrice(event.price)}
+                    </div>
+                     <div className="absolute top-4 left-4 capitalize bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
+                      {event.category}
                     </div>
                     {event.minted / event.maxTickets > 0.8 && (
                       <div className="absolute top-4 left-4">
@@ -267,6 +315,7 @@ export default function EventsPage() {
                 setSearchQuery("");
                 setSelectedLocation("");
                 setPriceRange("");
+                setSelectedCategory("");
               }}
               variant="outline"
               className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white rounded-full bg-transparent"
@@ -279,4 +328,3 @@ export default function EventsPage() {
     </div>
   );
 }
-

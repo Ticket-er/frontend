@@ -20,6 +20,7 @@ export interface Event {
   price: number;
   location: string;
   date: Date;
+  category: string;
   bannerUrl: string;
   isActive: boolean;
   organizerId: string;

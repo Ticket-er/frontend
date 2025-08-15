@@ -20,7 +20,7 @@ import { useAuth } from "@/lib/auth-context";
 const createEventSchema = z.object({
   name: z.string().min(3, "Event name is required"),
   description: z.string().min(10, "Description is required"),
-  // category: z.string().min(1, "Category is required"),
+  category: z.string().min(1, "Category is required"),
   location: z.string().min(3, "Location is required"),
   date: z.string().min(1, "Date is required"),
   time: z.string().min(1, "Time is required"),
@@ -47,7 +47,22 @@ export default function CreateEventPage() {
   const { mutateAsync: createEvent, isPending } = useCreateEvent();
   const { isLoading, user: currentUser } = useAuth();
   const router = useRouter();
-  // const categories = ["Music", "Technology", "Comedy", "Art", "Food", "Sports", "Business", "Other"]
+  const categories = [
+    "Music",
+    "Concert",
+    "Conference",
+    "Workshop",
+    "Sports",
+    "Comedy",
+    "Theatre",
+    "Festival",
+    "Exhibition",
+    "Religion",
+    "Networking",
+    "Tech",
+    "Fashion",
+    "Party",
+  ];
 
   const {
     register,
@@ -61,7 +76,7 @@ export default function CreateEventPage() {
     defaultValues: {
       name: "",
       description: "",
-      // category: "",
+      category: "",
       location: "",
       date: "",
       time: "",
@@ -101,7 +116,7 @@ export default function CreateEventPage() {
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("description", data.description);
-    // formData.append("category", data.category)
+    formData.append("category", data.category.toUpperCase());
     formData.append("location", data.location);
     formData.append("date", fullDate);
     formData.append("price", data.price.toString());
@@ -298,7 +313,7 @@ export default function CreateEventPage() {
                       )}
                     </div>
 
-                    {/* <div className="space-y-2">
+                    <div className="space-y-2">
                       <Label>Category *</Label>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                         {categories.map((category) => (
@@ -327,7 +342,7 @@ export default function CreateEventPage() {
                           {errors.category.message}
                         </p>
                       )}
-                    </div> */}
+                    </div>
 
                     <div className="space-y-2">
                       <Label>Event Banner</Label>
@@ -620,4 +635,3 @@ export default function CreateEventPage() {
     </div>
   );
 }
-
