@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Plus, Calendar, Users, TrendingUp, BarChart3 } from "lucide-react";
+import { Plus, Calendar, Users, TrendingUp, BarChart3, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,15 +10,15 @@ import { currentUser, dummyEvents, formatPrice } from "@/lib/dummy-data";
 import { Header } from "@/components/layout/header";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-import { useOrganizerEvents } from "@/api/events/events.queries";
+import { useDeleteEvent, useOrganizerEvents } from "@/api/events/events.queries";
 import { useEffect } from "react";
 import { Event } from "@/types/events.type";
 
 export default function OrganizerDashboard() {
   const { isLoading, user: currentUser } = useAuth();
-
   const router = useRouter();
   const { data: organizerEventList } = useOrganizerEvents();
+const { mutate: deleteEvent } = useDeleteEvent();
 
   useEffect(() => {
     if (!currentUser && !isLoading) {
@@ -33,11 +33,17 @@ export default function OrganizerDashboard() {
     }
   }, [currentUser, router]);
 
-  console.log(organizerEventList);
+
 
   const organizerEvents = organizerEventList?.filter(
     (event: Event) => currentUser && event.organizerId === currentUser.id
   );
+  //handle delete
+  const handleDelete = (eventId: string) => {
+    if (isLoading) return
+    console.log(eventId)
+    deleteEvent(eventId)
+  }
 
   // Calculate stats
   const totalEvents = organizerEvents?.length;
@@ -79,7 +85,7 @@ export default function OrganizerDashboard() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold">Organizer Dashboard</h1>
+              <h1 className="text-3xl font-bold">Dashboard</h1>
               <p className="text-muted-foreground">
                 Welcome back, {currentUser && currentUser.name}!
               </p>
@@ -206,6 +212,12 @@ export default function OrganizerDashboard() {
                           </div>
                         </div>
                         <div className="text-right">
+                       <Trash2
+                            onClick={() => handleDelete(event.id)
+                            }
+                            className="mx-auto mb-4 cursor-pointer"
+                            style={{ color: 'red' }}
+                          />
                           <div className="w-full bg-muted rounded-full h-2 mb-2">
                             <div
                               className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"

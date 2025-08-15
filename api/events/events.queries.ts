@@ -34,6 +34,16 @@ export const useCreateEvent = () => {
   });
 };
 
+export const useDeleteEvent = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (eventId: string) => eventsAPI.deleteEvent(eventId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["events"]})
+    }
+  })
+}
+
 export const useUpdateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -79,3 +89,4 @@ export const useUpcomingEvents = () => {
     queryFn: eventsAPI.getUpcomingEvents,
   });
 };
+

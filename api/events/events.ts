@@ -4,6 +4,7 @@ import {
   CreateEventDTO,
   UpdateEventDTO,
   EventFilterDTO,
+  deleteEventDTO
 } from "@/types/events.type";
 
 // FETCH all events
@@ -34,6 +35,21 @@ export const createEvent = async (formData: FormData) => {
     throw new Error(errorMessage);
   }
 };
+
+//Delete an event
+export const deleteEvent = async (eventId: string) => {
+  try{
+    const res = await axios.delete(`/events/${eventId}`)
+    console.log("everything is fineee")
+    toast.success(res.data.message) || "Event deleted successfully"
+    return res.data
+  }
+  catch(error: any){
+    const errorMessage = error.response?.data.message || "Failed to delete event"
+    toast.error(errorMessage)
+    throw new Error(errorMessage)
+  }
+}
 
 // UPDATE an event
 export const updateEvent = async (eventId: string, data: UpdateEventDTO) => {

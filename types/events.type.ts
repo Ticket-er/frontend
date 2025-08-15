@@ -62,3 +62,7 @@ export interface EventFilterDTO {
   endDate?: string;
   isActive?: boolean;
 }
+
+export interface deleteEventDTO{
+  id: string
+}
