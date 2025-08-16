@@ -52,14 +52,14 @@ export const useUpdateEvent = () => {
       data,
     }: {
       eventId: string;
-      data: UpdateEventDTO;
+      data: FormData; // Only accept FormData, matching useCreateEvent
     }) => eventsAPI.updateEvent(eventId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
+     // Invalidate specific event
     },
   });
 };
-
 export const useToggleEventStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({

@@ -44,13 +44,12 @@ export interface CreateEventDTO {
 }
 
 export interface UpdateEventDTO {
-  title?: string;
+  name?: string;
   description?: string;
   price?: number;
   location?: string;
-  startDate?: string;
-  endDate?: string;
-  image?: File;
+  date?:string
+  category?:string
 }
 
 export interface EventFilterDTO {

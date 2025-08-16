@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import {
   useDeleteEvent,
   useOrganizerEvents,
+  useUpdateEvent,
 } from "@/api/events/events.queries";
 import { useEffect, useState } from "react";
 import { Event } from "@/types/events.type";
@@ -47,6 +48,7 @@ export default function OrganizerDashboard() {
   const router = useRouter();
   const { data: organizerEventList } = useOrganizerEvents();
   const { mutate: deleteEvent } = useDeleteEvent();
+  // const {mutate: updateEvent} = useUpdateEvent()
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
@@ -96,6 +98,7 @@ export default function OrganizerDashboard() {
     setIsDeleteDialogOpen(false);
     setDeleteEventId(null);
   };
+
 
   // Calculate stats
   const totalEvents = organizerEvents?.length;
@@ -258,7 +261,7 @@ export default function OrganizerDashboard() {
                               className="bg-white shadow-lg rounded-md border border-gray-200"
                             >
                               <DropdownMenuItem
-                                onClick={() => handleDeleteClick(event.id)}
+                                onClick={() => router.push(`/organizer/update-event/${event.id}`)}
                                 className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
                               >
                                 <Edit className="mr-2 h-4 w-4" /> Update Event

@@ -52,13 +52,18 @@ export const deleteEvent = async (eventId: string) => {
 }
 
 // UPDATE an event
-export const updateEvent = async (eventId: string, data: UpdateEventDTO) => {
+export const updateEvent = async (eventId: string, formData: FormData) => {
   try {
-    const res = await axios.patch(`/events/${eventId}`, data);
+    const res = await axios.patch(`/events/${eventId}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data", // Explicitly set to match createEvent
+      },
+    });
     toast.success(res.data.message || "Event updated successfully");
     return res.data;
   } catch (error: any) {
     const errorMessage = error.response?.data?.message || "Failed to update event";
+    console.error("Update error:", errorMessage, error.response?.data);
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
