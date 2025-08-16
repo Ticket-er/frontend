@@ -2,7 +2,16 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Plus, Calendar, Users, TrendingUp, BarChart3, Trash2 } from "lucide-react";
+import {
+  Plus,
+  Calendar,
+  Users,
+  TrendingUp,
+  BarChart3,
+  Trash2,
+  MoreVertical,
+  Edit,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,15 +19,37 @@ import { currentUser, dummyEvents, formatPrice } from "@/lib/dummy-data";
 import { Header } from "@/components/layout/header";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-import { useDeleteEvent, useOrganizerEvents } from "@/api/events/events.queries";
-import { useEffect } from "react";
+import {
+  useDeleteEvent,
+  useOrganizerEvents,
+} from "@/api/events/events.queries";
+import { useEffect, useState } from "react";
 import { Event } from "@/types/events.type";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogOverlay,
+  DialogTitle,
+  DialogTrigger,
+} from "@radix-ui/react-dialog";
+import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 
 export default function OrganizerDashboard() {
   const { isLoading, user: currentUser } = useAuth();
   const router = useRouter();
   const { data: organizerEventList } = useOrganizerEvents();
-const { mutate: deleteEvent } = useDeleteEvent();
+  const { mutate: deleteEvent } = useDeleteEvent();
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!currentUser && !isLoading) {
@@ -33,46 +64,51 @@ const { mutate: deleteEvent } = useDeleteEvent();
     }
   }, [currentUser, router]);
 
+  const organizerEvents = Array.isArray(organizerEventList)
+    ? organizerEventList.filter(
+        (event: Event) => currentUser && event.organizerId === currentUser.id
+      )
+    : [];
 
+  // Handle delete click
+  const handleDeleteClick = (eventId: string) => {
+    setDeleteEventId(eventId);
+    setIsDeleteDialogOpen(true);
+  };
 
-  const organizerEvents = organizerEventList?.filter(
-    (event: Event) => currentUser && event.organizerId === currentUser.id
-  );
-  //handle delete
-  const handleDelete = (eventId: string) => {
-    if (isLoading) return
-    console.log(eventId)
-    deleteEvent(eventId)
-  }
+  const confirmDelete = () => {
+    if (deleteEventId) {
+      deleteEvent(deleteEventId, {
+        onSuccess: () => {
+          setIsDeleteDialogOpen(false);
+          setDeleteEventId(null);
+          // Optionally refetch events or update state
+        },
+        onError: (error) => {
+          console.error("Failed to delete event:", error);
+          setIsDeleteDialogOpen(false);
+        },
+      });
+    }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteDialogOpen(false);
+    setDeleteEventId(null);
+  };
 
   // Calculate stats
   const totalEvents = organizerEvents?.length;
-  interface OrganizerStats {
-    totalTicketsSold: number;
-  }
-
-  const totalTicketsSold: OrganizerStats["totalTicketsSold"] =
-    organizerEvents?.reduce(
-      (sum: number, event: Event) => sum + event.minted,
-      0
-    );
-  interface RevenueAccumulator {
-    sum: number;
-  }
-
-  interface OrganizerEvent extends Event {
-    minted: number;
-    price: number;
-  }
-
-  const totalRevenue: RevenueAccumulator["sum"] = organizerEvents?.reduce(
-    (sum: number, event: OrganizerEvent) => sum + event.minted * event.price,
+  const totalTicketsSold = organizerEvents?.reduce(
+    (sum: number, event: Event) => sum + event.minted,
+    0
+  );
+  const totalRevenue = organizerEvents?.reduce(
+    (sum: number, event: Event) => sum + event.minted * event.price,
     0
   );
   const avgTicketsSold =
     totalEvents > 0 ? Math.round(totalTicketsSold / totalEvents) : 0;
-
-  // Filter events created by current user (in real app, this would be fetched from API)
 
   return (
     <div className="min-h-screen bg-background">
@@ -211,14 +247,32 @@ const { mutate: deleteEvent } = useDeleteEvent();
                             </span>
                           </div>
                         </div>
-                        <div className="text-right">
-                       <Trash2
-                            onClick={() => handleDelete(event.id)
-                            }
-                            className="mx-auto mb-4 cursor-pointer"
-                            style={{ color: 'red' }}
-                          />
-                          <div className="w-full bg-muted rounded-full h-2 mb-2">
+                        <div className="flex flex-col items-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <MoreVertical className="cursor-pointer" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              side="top"
+                              className="bg-white shadow-lg rounded-md border border-gray-200"
+                            >
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteClick(event.id)}
+                                className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
+                              >
+                                <Edit className="mr-2 h-4 w-4" /> Update Event
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator className="bg-gray-200 h-px my-1" />
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteClick(event.id)}
+                                className="text-sm text-white bg-red-600 hover:bg-red-400 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" /> Delete Event
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                          <div className="w-24 bg-muted rounded-full h-2 mt-2">
                             <div
                               className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"
                               style={{
@@ -228,7 +282,7 @@ const { mutate: deleteEvent } = useDeleteEvent();
                               }}
                             />
                           </div>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-muted-foreground mt-1 text-right">
                             {Math.round(
                               (event.minted / event.maxTickets) * 100
                             )}
@@ -261,7 +315,39 @@ const { mutate: deleteEvent } = useDeleteEvent();
           </motion.div>
         </motion.div>
       </div>
+      {/* Global Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogOverlay className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" />
+        <DialogContent className="sm:max-w-[425px] bg-white/90 p-8 rounded-2xl shadow-2xl border border-gray-200 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
+          <DialogHeader>
+            <DialogTitle className="text-2xl text-center font-semibold text-gray-900">
+              Confirm Deletion
+            </DialogTitle>
+            <DialogDescription className="text-sm text-gray-600">
+              Are you sure you want to delete this event?
+              <span className="block mt-2 text-red-600 font-medium">
+                This action cannot be undone.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-32 mt-4">
+            <Button
+              variant="outline"
+              onClick={cancelDelete}
+              className="rounded-xl"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              className="rounded-xl"
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-
