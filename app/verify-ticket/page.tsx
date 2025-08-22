@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { parseTicketData, type QRTicketData } from "@/lib/qr-utils";
 import { Header } from "@/components/layout/header";
-import { useVerifyTicket } from "@/api/tickets/tickets.queries";
+import { useVerifyTicket } from "@/services/tickets/tickets.queries";
 import { useAuth } from "@/lib/auth-context";
 import { formatDate, formatPrice } from "@/lib/dummy-data";
 import { toast } from "sonner";
@@ -335,4 +335,3 @@ export default function VerifyTicketPage() {
     </div>
   );
 }
-

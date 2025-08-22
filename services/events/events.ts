@@ -1,10 +1,10 @@
-import axios from "@/api/axios";
+import axios from "@/services/axios";
 import { toast } from "sonner";
 import {
   CreateEventDTO,
   UpdateEventDTO,
   EventFilterDTO,
-  deleteEventDTO
+  deleteEventDTO,
 } from "@/types/events.type";
 
 // FETCH all events
@@ -30,7 +30,8 @@ export const createEvent = async (formData: FormData) => {
     toast.success(res.data.message || "Event created successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to create event";
+    const errorMessage =
+      error.response?.data?.message || "Failed to create event";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }
@@ -38,18 +39,18 @@ export const createEvent = async (formData: FormData) => {
 
 //Delete an event
 export const deleteEvent = async (eventId: string) => {
-  try{
-    const res = await axios.delete(`/events/${eventId}`)
-    console.log("everything is fineee")
-    toast.success(res.data.message) || "Event deleted successfully"
-    return res.data
+  try {
+    const res = await axios.delete(`/events/${eventId}`);
+    console.log("everything is fineee");
+    toast.success(res.data.message) || "Event deleted successfully";
+    return res.data;
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data.message || "Failed to delete event";
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
   }
-  catch(error: any){
-    const errorMessage = error.response?.data.message || "Failed to delete event"
-    toast.error(errorMessage)
-    throw new Error(errorMessage)
-  }
-}
+};
 
 // UPDATE an event
 export const updateEvent = async (eventId: string, formData: FormData) => {
@@ -62,7 +63,8 @@ export const updateEvent = async (eventId: string, formData: FormData) => {
     toast.success(res.data.message || "Event updated successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to update event";
+    const errorMessage =
+      error.response?.data?.message || "Failed to update event";
     console.error("Update error:", errorMessage, error.response?.data);
     toast.error(errorMessage);
     throw new Error(errorMessage);
@@ -76,7 +78,8 @@ export const toggleEventStatus = async (eventId: string) => {
     toast.success(res.data.message || "Event status toggled successfully");
     return res.data;
   } catch (error: any) {
-    const errorMessage = error.response?.data?.message || "Failed to toggle event status";
+    const errorMessage =
+      error.response?.data?.message || "Failed to toggle event status";
     toast.error(errorMessage);
     throw new Error(errorMessage);
   }

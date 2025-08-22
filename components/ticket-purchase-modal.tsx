@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Plus, Minus, CreditCard, Lock } from "lucide-react";
 import { formatDate, formatPrice, formatTime } from "@/lib/dummy-data";
 import { useAuth } from "@/lib/auth-context";
-import { useBuyTicket } from "@/api/tickets/tickets.queries";
+import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
 
 interface Event {
@@ -327,4 +327,3 @@ export function TicketPurchaseModal({
     </AnimatePresence>
   );
 }
-

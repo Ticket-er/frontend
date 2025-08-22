@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { toast } from "sonner";
-import { useVerifyOtp, useResendOtp } from "@/api/auth/auth.queries";
+import { useVerifyOtp, useResendOtp } from "@/services/auth/auth.queries";
 import { ResendOtpDto } from "@/types/auth.type";
 import { z } from "zod";
 import { useAuth } from "@/lib/auth-context";
@@ -208,4 +208,3 @@ export default function VerifyOTPPage() {
     </div>
   );
 }
-

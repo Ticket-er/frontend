@@ -1,6 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import * as eventsAPI from "@/api/events/events";
-import { CreateEventDTO, EventFilterDTO, UpdateEventDTO } from "@/types/events.type";
+import * as eventsAPI from "@/services/events/events";
+import {
+  CreateEventDTO,
+  EventFilterDTO,
+  UpdateEventDTO,
+} from "@/types/events.type";
 
 export const useAllEvents = () => {
   return useQuery({
@@ -39,10 +43,10 @@ export const useDeleteEvent = () => {
   return useMutation({
     mutationFn: (eventId: string) => eventsAPI.deleteEvent(eventId),
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["events"]})
-    }
-  })
-}
+      queryClient.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+};
 
 export const useUpdateEvent = () => {
   const queryClient = useQueryClient();
@@ -56,7 +60,7 @@ export const useUpdateEvent = () => {
     }) => eventsAPI.updateEvent(eventId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
-     // Invalidate specific event
+      // Invalidate specific event
     },
   });
 };
@@ -89,4 +93,3 @@ export const useUpcomingEvents = () => {
     queryFn: eventsAPI.getUpcomingEvents,
   });
 };
-

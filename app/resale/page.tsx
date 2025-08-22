@@ -21,7 +21,7 @@ import { useAuth } from "@/lib/auth-context";
 import {
   useResaleListings,
   useBuyResaleTicket,
-} from "@/api/tickets/tickets.queries";
+} from "@/services/tickets/tickets.queries";
 import { BuyResaleModal } from "@/components/buy-resale-modal";
 import { toast } from "sonner";
 import { TicketResale } from "@/types/tickets.type";
@@ -376,4 +376,3 @@ export default function ResalePage() {
     </div>
   );
 }
-

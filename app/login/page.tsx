@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Eye, EyeOff, Mail, Lock, AlertCircle } from "lucide-react";
-import { useLogin } from "@/api/auth/auth.queries";
+import { useLogin } from "@/services/auth/auth.queries";
 import { Logo } from "@/components/layout/logo";
 
 // 🧠 Zod Schema
@@ -182,4 +182,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
-import { useUpdateEvent } from "@/api/events/events.queries";
-import { getEventById } from "@/api/events/events";
+import { useUpdateEvent } from "@/services/events/events.queries";
+import { getEventById } from "@/services/events/events";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,9 +57,7 @@ const updateEventSchema = z.object({
     .refine((val) => new Date(val) >= new Date(), "Date cannot be in the past"),
   time: z.string().min(1, "Time is required"),
   price: z.coerce.number().min(0, "Price is required"),
-  quantity: z.coerce
-    .number()
-    .min(1, "Total tickets must be at least 1"),
+  quantity: z.coerce.number().min(1, "Total tickets must be at least 1"),
   banner: z
     .any()
     .refine(
@@ -85,7 +83,11 @@ export default function UpdateEventPage() {
   const eventId = Array.isArray(params.id) ? params.id[0] : params.id;
 
   // Fetch event data
-  const { data: event, isLoading: eventLoading, error } = useQuery({
+  const {
+    data: event,
+    isLoading: eventLoading,
+    error,
+  } = useQuery({
     queryKey: ["event", eventId],
     queryFn: () => getEventById(eventId!),
     enabled: !!eventId,
@@ -158,38 +160,40 @@ export default function UpdateEventPage() {
     };
   }, [previewUrl, watch]);
 
-  const canProceedStep1 = watch("name") && watch("description") && watch("category");
+  const canProceedStep1 =
+    watch("name") && watch("description") && watch("category");
   const canProceedStep2 =
     watch("location") &&
     watch("date") &&
     watch("time") &&
     watch("price") !== undefined &&
     watch("quantity");
-const onSubmit = async (data: UpdateEventForm) => {
-  const fullDate = `${data.date}T${data.time}:00`;
+  const onSubmit = async (data: UpdateEventForm) => {
+    const fullDate = `${data.date}T${data.time}:00`;
 
-  // Always use FormData for consistency with backend multipart expectation
-  const formData = new FormData();
-  formData.append("name", data.name);
-  formData.append("description", data.description);
-  formData.append("category", data.category);
-  formData.append("location", data.location);
-  formData.append("date", fullDate);
-  formData.append("price", String(data.price));
-  formData.append("maxTickets", String(data.quantity)); // 👈 Add this to send quantity as maxTickets
+    // Always use FormData for consistency with backend multipart expectation
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", data.description);
+    formData.append("category", data.category);
+    formData.append("location", data.location);
+    formData.append("date", fullDate);
+    formData.append("price", String(data.price));
+    formData.append("maxTickets", String(data.quantity)); // 👈 Add this to send quantity as maxTickets
 
-  // Conditionally append file if a new banner is selected
-  if (data.banner instanceof File) {
-    formData.append("file", data.banner);
-  }
+    // Conditionally append file if a new banner is selected
+    if (data.banner instanceof File) {
+      formData.append("file", data.banner);
+    }
 
-  try {
-    await updateEvent({ eventId, data: formData });
-    setIsSubmitted(true);
-  } catch (error) {
-    console.error("Event update failed:", error);
-  }
-};  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      await updateEvent({ eventId, data: formData });
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error("Event update failed:", error);
+    }
+  };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setValue("banner", file);
   };
@@ -230,9 +234,7 @@ const onSubmit = async (data: UpdateEventForm) => {
             Loading...
           </h2>
           <p className="text-gray-600">
-            {authLoading
-              ? "Verifying your session"
-              : "Fetching event details"}
+            {authLoading ? "Verifying your session" : "Fetching event details"}
           </p>
         </div>
       </motion.div>
@@ -417,7 +419,10 @@ const onSubmit = async (data: UpdateEventForm) => {
                             size="sm"
                             onClick={() => {
                               setValue("category", category.toUpperCase());
-                              console.log("Category selected:", category.toUpperCase());
+                              console.log(
+                                "Category selected:",
+                                category.toUpperCase()
+                              );
                             }}
                             className={
                               watch("category") === category.toUpperCase()
@@ -723,7 +728,9 @@ const onSubmit = async (data: UpdateEventForm) => {
                       className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       onClick={handleNext}
                       disabled={
-                        (currentStep === 1 ? !canProceedStep1 : !canProceedStep2) ||
+                        (currentStep === 1
+                          ? !canProceedStep1
+                          : !canProceedStep2) ||
                         isPending ||
                         isSubmitting
                       }
@@ -738,7 +745,9 @@ const onSubmit = async (data: UpdateEventForm) => {
                       className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                       disabled={isPending || isSubmitting}
                     >
-                      {isPending || isSubmitting ? "Updating..." : "Update Event"}
+                      {isPending || isSubmitting
+                        ? "Updating..."
+                        : "Update Event"}
                     </Button>
                   )}
                 </div>

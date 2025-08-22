@@ -11,7 +11,7 @@ import {
   useWalletBalance,
   useWalletTransactions,
   useWalletPinStatus,
-} from "@/api/wallet/wallet.queries";
+} from "@/services/wallet/wallet.queries";
 import { useAuth } from "@/lib/auth-context";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -525,4 +525,3 @@ export default function WalletPage() {
     </div>
   );
 }
-

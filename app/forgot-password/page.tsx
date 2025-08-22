@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Mail, AlertCircle } from "lucide-react";
-import { useForgotPassword } from "@/api/auth/auth.queries";
+import { useForgotPassword } from "@/services/auth/auth.queries";
 
 // ✅ Zod Schema
 const forgotPasswordSchema = z.object({
@@ -139,4 +139,3 @@ export default function ForgotPasswordPage() {
     </div>
   );
 }
-

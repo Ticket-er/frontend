@@ -17,11 +17,11 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useWithdrawWallet } from "@/api/wallet/wallet.queries";
+import { useWithdrawWallet } from "@/services/wallet/wallet.queries";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/dummy-data";
 import { useAuth } from "@/lib/auth-context";
-import { useBankCodes } from "@/api/banks/bank.queries";
+import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";
 
 // Define Zod schema for WithdrawPayload

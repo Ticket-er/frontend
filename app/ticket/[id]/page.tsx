@@ -7,7 +7,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useMyTickets, useListResale } from "@/api/tickets/tickets.queries";
+import {
+  useMyTickets,
+  useListResale,
+} from "@/services/tickets/tickets.queries";
 import { ResaleModal } from "@/components/resale-modal";
 import { QRCodeDisplay } from "@/components/qr-code-display";
 import { useAuth } from "@/lib/auth-context";
@@ -278,4 +281,3 @@ export default function TicketDetailPage({
     </div>
   );
 }
-

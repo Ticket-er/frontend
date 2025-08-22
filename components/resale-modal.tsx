@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatDate, formatPrice } from "@/lib/dummy-data";
 import { useState } from "react";
-import { useBankCodes } from "@/api/banks/bank.queries";
+import { useBankCodes } from "@/services/banks/bank.queries";
 import { Bank } from "@/types/bank.type";
 
 interface ResaleModalProps {

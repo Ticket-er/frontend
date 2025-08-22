@@ -15,8 +15,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useEventById } from "@/api/events/events.queries";
-import { useMyTickets, useResaleListings } from "@/api/tickets/tickets.queries";
+import { useEventById } from "@/services/events/events.queries";
+import {
+  useMyTickets,
+  useResaleListings,
+} from "@/services/tickets/tickets.queries";
 import { useAuth } from "@/lib/auth-context";
 import { TicketPurchaseModal } from "@/components/ticket-purchase-modal";
 import { formatDate, formatPrice } from "@/lib/dummy-data";
@@ -348,4 +351,3 @@ export default function EventPage({ params }: { params: { id: string } }) {
     </div>
   );
 }
-

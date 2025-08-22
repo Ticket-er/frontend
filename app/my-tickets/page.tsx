@@ -8,7 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ResaleModal } from "@/components/resale-modal";
-import { useMyTickets, useListResale } from "@/api/tickets/tickets.queries";
+import {
+  useMyTickets,
+  useListResale,
+} from "@/services/tickets/tickets.queries";
 import { Ticket } from "@/types/tickets.type";
 import { formatDate, formatPrice } from "@/lib/dummy-data";
 import { toast } from "sonner";
@@ -346,4 +349,3 @@ export default function MyTicketsPage() {
     </div>
   );
 }
-

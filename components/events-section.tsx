@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useAllEvents } from "@/api/events/events.queries";
+import { useAllEvents } from "@/services/events/events.queries";
 import { Event } from "@/types/events.type";
 import { formatDate, formatPrice } from "@/lib/dummy-data";
 
@@ -107,4 +107,3 @@ export function EventsSection() {
     </section>
   );
 }
-

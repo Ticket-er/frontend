@@ -15,7 +15,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { formatPrice, formatDate, formatTime } from "@/lib/dummy-data";
-import { useAllEvents } from "@/api/events/events.queries";
+import { useAllEvents } from "@/services/events/events.queries";
 import { Event } from "@/types/events.type";
 
 export default function EventsPage() {
@@ -244,7 +244,7 @@ export default function EventsPage() {
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
                       {formatPrice(event.price)}
                     </div>
-                     <div className="absolute top-4 left-4 capitalize bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
+                    <div className="absolute top-4 left-4 capitalize bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
                       {event.category}
                     </div>
                     {event.minted / event.maxTickets > 0.8 && (

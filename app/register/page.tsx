@@ -12,8 +12,8 @@ import { Eye, EyeOff, User, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { useRegister } from "@/api/auth/auth.queries";
-import { useBecomeOrganizer } from "@/api/user/user.queries";
+import { useRegister } from "@/services/auth/auth.queries";
+import { useBecomeOrganizer } from "@/services/user/user.queries";
 import { toast } from "sonner";
 import { Logo } from "@/components/layout/logo";
 
@@ -276,4 +276,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
