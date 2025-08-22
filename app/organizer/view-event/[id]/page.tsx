@@ -1,9 +1,9 @@
+// organizer/event/[id]/page.tsx
 "use client";
 
 import { motion } from "framer-motion";
 import Link from "next/link";
 import {
-  Plus,
   Calendar,
   Users,
   TrendingUp,
@@ -11,18 +11,16 @@ import {
   Trash2,
   MoreVertical,
   Edit,
+  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { currentUser, dummyEvents, formatPrice } from "@/lib/dummy-data";
-import { Header } from "@/components/layout/header";
+import { currentUser } from "@/lib/dummy-data";
 import { useAuth } from "@/lib/auth-context";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import {
   useDeleteEvent,
   useOrganizerEvents,
-  useUpdateEvent,
 } from "@/api/events/events.queries";
 import { useEffect, useState } from "react";
 import { Event } from "@/types/events.type";
@@ -42,10 +40,13 @@ import {
   DialogTrigger,
 } from "@radix-ui/react-dialog";
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
+import { formatPrice } from "@/lib/dummy-data";
 
-export default function OrganizerDashboard() {
+export default function EventDashboard() {
   const { isLoading, user: currentUser } = useAuth();
   const router = useRouter();
+  const params = useParams();
+  const { id } = params; // Extract id from dynamic route
   const { data: organizerEventList } = useOrganizerEvents();
   const { mutate: deleteEvent } = useDeleteEvent();
 
@@ -71,6 +72,12 @@ export default function OrganizerDashboard() {
       )
     : [];
 
+  const event = organizerEvents.find((e: Event) => e.id === id);
+
+  if (!event) {
+    return <div className="min-h-screen bg-background text-center py-8">Event not found</div>;
+  }
+
   const handleDeleteClick = (eventId: string) => {
     setDeleteEventId(eventId);
     setIsDeleteDialogOpen(true);
@@ -82,6 +89,7 @@ export default function OrganizerDashboard() {
         onSuccess: () => {
           setIsDeleteDialogOpen(false);
           setDeleteEventId(null);
+          router.push("/organizer"); // Redirect to general dashboard after delete
         },
         onError: (error) => {
           console.error("Failed to delete event:", error);
@@ -96,17 +104,12 @@ export default function OrganizerDashboard() {
     setDeleteEventId(null);
   };
 
-  const totalEvents = organizerEvents?.length;
-  const totalTicketsSold = organizerEvents?.reduce(
-    (sum: number, event: Event) => sum + event.minted,
-    0
-  );
-  const totalRevenue = organizerEvents?.reduce(
-    (sum: number, event: Event) => sum + event.minted * event.price,
-    0
-  );
-  const avgTicketsSold =
-    totalEvents > 0 ? Math.round(totalTicketsSold / totalEvents) : 0;
+  const totalTickets = event.maxTickets;
+  const ticketsSold = event.minted;
+  const totalRevenue = event.minted * event.price;
+  const percentageSold = Math.round((ticketsSold / totalTickets) * 100);
+  const avgTicketPrice = event.price;
+  const lastUpdated = "12:53 PM WAT, August 21, 2025";
 
   return (
     <div className="min-h-screen bg-background">
@@ -119,18 +122,18 @@ export default function OrganizerDashboard() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">{event.name}</h1>
               <p className="text-sm sm:text-base text-muted-foreground">
-                Welcome back, {currentUser && currentUser.name}!
+                Welcome back, {currentUser && currentUser.name}! Managing {event.name}
               </p>
             </div>
             <Button
               asChild
               className="w-full sm:w-auto bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <Link href="/organizer/create-event">
-                <Plus className="h-4 w-4 mr-2" />
-                Create New Event
+              <Link href="/organizer">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Dashboard
               </Link>
             </Button>
           </div>
@@ -145,15 +148,15 @@ export default function OrganizerDashboard() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xs sm:text-sm font-medium">
-                    Total Events
+                    Total Tickets
                   </CardTitle>
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">
-                    {organizerEvents?.length}
+                    {totalTickets}
                   </div>
-                  <p className="text-xs text-muted-foreground">Active events</p>
+                  <p className="text-xs text-muted-foreground">Available tickets</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -171,10 +174,28 @@ export default function OrganizerDashboard() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">{totalTicketsSold}</div>
+                  <div className="text-xl sm:text-2xl font-bold">{ticketsSold}</div>
                   <p className="text-xs text-muted-foreground">
-                    Across all events
+                    Out of {totalTickets}
                   </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-xs sm:text-sm font-medium">
+                    Percentage Sold
+                  </CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl sm:text-2xl font-bold">{percentageSold}%</div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -200,7 +221,7 @@ export default function OrganizerDashboard() {
             </motion.div>
           </div>
 
-          {/* Events List */}
+          {/* Event Details */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -208,100 +229,95 @@ export default function OrganizerDashboard() {
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl sm:text-2xl">Your Events</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">Event Details</CardTitle>
               </CardHeader>
               <CardContent>
-                {organizerEvents?.length > 0 ? (
-                  <div className="space-y-4">
-                    {organizerEvents?.map((event: Event, index: number) => (
-                      <motion.div
-                        key={event.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.4, delay: index * 0.1 }}
-                        className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                        onClick={() => router.push(`/organizer/view-event/${event.id}`)}
-                      >
-                        <img
-                          src={event.bannerUrl || "/placeholder.svg"}
-                          alt={event.name}
-                          className="w-16 h-16 rounded-lg object-cover"
-                        />
-                        <div className="flex-1 w-full sm:w-auto">
-                          <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-1">
-                            <h3 className="font-semibold text-sm sm:text-base">{event.name}</h3>
-                          </div>
-                          <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
-                            {new Date(event.date).toLocaleDateString()} • {event.location}
-                          </p>
-                          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
-                            <span className="text-muted-foreground">
-                              {event.minted}/{event.maxTickets} sold
-                            </span>
-                            <span className="text-green-600 font-medium">
-                              ₦{(event.minted * event.price).toLocaleString()} revenue
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col items-end w-full sm:w-auto">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              side="right"
-                              className="bg-white shadow-lg rounded-md border border-gray-200 mt-2"
-                            >
-                              <DropdownMenuItem
-                                onClick={() => router.push(`/organizer/update-event/${event.id}`)}
-                                className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
-                              >
-                                <Edit className="mr-2 h-4 w-4" /> Update Event
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator className="bg-gray-200 h-px my-1" />
-                              <DropdownMenuItem
-                                onClick={() => handleDeleteClick(event.id)}
-                                className="text-sm text-white bg-red-600 hover:bg-red-400 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete Event
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                          <div className="w-full sm:w-24 bg-muted rounded-full h-2 mt-2">
-                            <div
-                              className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"
-                              style={{
-                                width: `${(event.minted / event.maxTickets) * 100}%`,
-                              }}
-                            />
-                          </div>
-                          <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-right">
-                            {Math.round((event.minted / event.maxTickets) * 100)}% sold
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">
-                      No events yet
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      Create your first event to start selling tickets and managing attendees.
+                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 border rounded-lg">
+                  <img
+                    src={event.bannerUrl || "/placeholder.svg"}
+                    alt={event.name}
+                    className="w-32 h-32 rounded-lg object-cover"
+                  />
+                  <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 mb-1">
+                      <h3 className="font-semibold text-base sm:text-lg">{event.name}</h3>
+                    </div>
+                    <p className="text-sm sm:text-base text-muted-foreground mb-2">
+                      {new Date(event.date).toLocaleDateString()} • {event.location}
                     </p>
-                    <Button asChild>
-                      <Link href="/organizer/create-event">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create Your First Event
-                      </Link>
-                    </Button>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm">
+                      <span className="text-muted-foreground">
+                        {event.minted}/{event.maxTickets} sold
+                      </span>
+                      <span className="text-green-600 font-medium">
+                        ₦{(event.minted * event.price).toLocaleString()} revenue
+                      </span>
+                    </div>
                   </div>
-                )}
+                  <div className="flex flex-col items-end">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        side="right"
+                        className="bg-white shadow-lg rounded-md border border-gray-200 mt-2"
+                      >
+                        <DropdownMenuItem
+                          onClick={() => router.push(`/organizer/update-event/${event.id}`)}
+                          className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
+                        >
+                          <Edit className="mr-2 h-4 w-4" /> Update Event
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-gray-200 h-px my-1" />
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteClick(event.id)}
+                          className="text-sm text-white bg-red-600 hover:bg-red-400 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete Event
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div className="w-full sm:w-32 bg-muted rounded-full h-2 mt-2">
+                      <div
+                        className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"
+                        style={{
+                          width: `${percentageSold}%`,
+                        }}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1 text-right">
+                      {percentageSold}% sold
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <Button asChild variant="outline">
+                    <Link href={`/organizer/event/${event.id}/attendees`}>
+                      View Attendees
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Optional Analytics Placeholder */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="mt-8"
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl sm:text-2xl">Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Sales trends and insights coming soon.</p>
               </CardContent>
             </Card>
           </motion.div>
