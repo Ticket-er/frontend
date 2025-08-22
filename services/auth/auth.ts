@@ -66,7 +66,7 @@ export const resendOtp = async (dto: ResendOtpDto): Promise<BasicResponse> => {
   }
 };
 
-// FORGOT PASSWORD
+// FORGOT Password
 export const forgotPassword = async (
   dto: ForgotPasswordDto
 ): Promise<BasicResponse> => {
