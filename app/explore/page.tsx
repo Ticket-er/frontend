@@ -13,6 +13,7 @@ import {
   Users,
   Search,
   SlidersHorizontal,
+  Loader2,
 } from "lucide-react";
 import { formatPrice, formatDate, formatTime } from "@/lib/dummy-data";
 import { useAllEvents } from "@/services/events/events.queries";
@@ -24,7 +25,18 @@ export default function EventsPage() {
   const [priceRange, setPriceRange] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const { data: events } = useAllEvents();
+  const { data: events, isLoading: eventsLoading } = useAllEvents();
+
+  if (eventsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-16">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-[#1E88E5] mx-auto mb-4" />
+          <p className="text-lg text-muted-foreground">Loading events...</p>
+        </div>
+      </div>
+    );
+  }
 
   const locations = [
     ...new Set(
@@ -72,7 +84,7 @@ export default function EventsPage() {
 
     let matchesPrice = true;
     if (priceRange) {
-      const price = event.price / 100;
+      const price = event.price ? event.price / 100 : 0; // Default to 0 if price is undefined
       switch (priceRange) {
         case "0-5000":
           matchesPrice = price < 50;
@@ -223,78 +235,84 @@ export default function EventsPage() {
 
         {/* Events Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredEvents?.map((event: Event, index: number) => (
-            <motion.div
-              key={event.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="group"
-            >
-              <Link href={`/events/${event.id}`}>
-                <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                  <div className="relative overflow-hidden">
-                    <Image
-                      src={event.bannerUrl || "/placeholder.svg"}
-                      alt={event.name}
-                      width={400}
-                      height={250}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
-                      {formatPrice(event.price)}
-                    </div>
-                    <div className="absolute top-4 left-4 capitalize bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
-                      {event.category}
-                    </div>
-                    {event.minted / event.maxTickets > 0.8 && (
-                      <div className="absolute top-4 left-4">
-                        <Badge variant="destructive" className="bg-red-500">
-                          Almost Sold Out
-                        </Badge>
+          {filteredEvents?.map((event: Event, index: number) => {
+            const minted = event.minted || 0; // Default to 0 if undefined
+            const maxTickets = event.maxTickets || 0; // Default to 0 if undefined
+            const ticketsAvailable = maxTickets - minted;
+
+            return (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="group"
+              >
+                <Link href={`/events/${event.id}`}>
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                    <div className="relative overflow-hidden">
+                      <Image
+                        src={event.bannerUrl || "/placeholder.svg"}
+                        alt={event.name}
+                        width={400}
+                        height={250}
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
+                        {formatPrice(event.price || 0)}
                       </div>
-                    )}
+                      <div className="absolute top-4 left-4 capitalize bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
+                        {event.category}
+                      </div>
+                      {maxTickets > 0 && minted / maxTickets > 0.8 && (
+                        <div className="absolute top-4 left-4">
+                          <Badge variant="destructive" className="bg-red-500">
+                            Almost Sold Out
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
+                        {event.name}
+                      </h3>
+
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-gray-600">
+                          <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <span className="text-sm">
+                            {formatDate(event.date)} at {formatTime(event.date)}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <span className="text-sm line-clamp-1">
+                            {event.location}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <Users className="w-4 h-4 mr-2 flex-shrink-0" />
+                          <span className="text-sm">
+                            {ticketsAvailable} tickets available
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-center w-full">
+                        <Button
+                          size="lg"
+                          className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full font-semibold"
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
-                      {event.name}
-                    </h3>
-
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center text-gray-600">
-                        <Calendar className="w-4 h-4 mr-2 flex-shrink-0" />
-                        <span className="text-sm">
-                          {formatDate(event.date)} at {formatTime(event.date)}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <MapPin className="w-4 h-4 mr-2 flex-shrink-0" />
-                        <span className="text-sm line-clamp-1">
-                          {event.location}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <Users className="w-4 h-4 mr-2 flex-shrink-0" />
-                        <span className="text-sm">
-                          {event.maxTickets - event.minted} tickets available
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-center w-full">
-                      <Button
-                        size="lg"
-                        className="w-full bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full font-semibold"
-                      >
-                        View Details
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
 
         {filteredEvents?.length === 0 && (

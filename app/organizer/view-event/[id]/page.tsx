@@ -1,4 +1,3 @@
-// organizer/event/[id]/page.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -12,6 +11,7 @@ import {
   MoreVertical,
   Edit,
   ArrowLeft,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +21,7 @@ import { useRouter, useParams } from "next/navigation";
 import {
   useDeleteEvent,
   useOrganizerEvents,
-} from "@/api/events/events.queries";
+} from "@/services/events/events.queries";
 import { useEffect, useState } from "react";
 import { Event } from "@/types/events.type";
 import {
@@ -43,18 +43,18 @@ import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { formatPrice } from "@/lib/dummy-data";
 
 export default function EventDashboard() {
-  const { isLoading, user: currentUser } = useAuth();
+  const { isLoading: authLoading, user: currentUser } = useAuth();
   const router = useRouter();
   const params = useParams();
   const { id } = params; // Extract id from dynamic route
-  const { data: organizerEventList } = useOrganizerEvents();
+  const { data: organizerEventList, isLoading: eventsLoading } = useOrganizerEvents();
   const { mutate: deleteEvent } = useDeleteEvent();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!currentUser && !isLoading) {
+    if (!currentUser && !authLoading) {
       router.push(
         `/login?returnUrl=${encodeURIComponent(window.location.href)}`
       );
@@ -64,7 +64,18 @@ export default function EventDashboard() {
       router.push("/explore");
       return;
     }
-  }, [currentUser, router]);
+  }, [currentUser, authLoading, router]);
+
+  if (eventsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-[#1E88E5] mx-auto mb-4" />
+          <p className="text-lg text-muted-foreground">Loading event details...</p>
+        </div>
+      </div>
+    );
+  }
 
   const organizerEvents = Array.isArray(organizerEventList)
     ? organizerEventList.filter(
@@ -104,11 +115,11 @@ export default function EventDashboard() {
     setDeleteEventId(null);
   };
 
-  const totalTickets = event.maxTickets;
-  const ticketsSold = event.minted;
-  const totalRevenue = event.minted * event.price;
-  const percentageSold = Math.round((ticketsSold / totalTickets) * 100);
-  const avgTicketPrice = event.price;
+  const totalTickets = event.maxTickets || 0;
+  const ticketsSold = event.minted || 0;
+  const totalRevenue = (event.minted || 0) * (event.price || 0);
+  const percentageSold = totalTickets > 0 ? Math.round((ticketsSold / totalTickets) * 100) : 0;
+  const avgTicketPrice = event.price || 0;
   const lastUpdated = "12:53 PM WAT, August 21, 2025";
 
   return (
@@ -247,10 +258,10 @@ export default function EventDashboard() {
                     </p>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm">
                       <span className="text-muted-foreground">
-                        {event.minted}/{event.maxTickets} sold
+                        {ticketsSold}/{totalTickets} sold
                       </span>
                       <span className="text-green-600 font-medium">
-                        ₦{(event.minted * event.price).toLocaleString()} revenue
+                        ₦{totalRevenue.toLocaleString()} revenue
                       </span>
                     </div>
                   </div>

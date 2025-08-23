@@ -1,6 +1,7 @@
 import { Ticket } from "lucide-react";
 import { Event } from "./events.type";
 import { User } from "./user.type";
+import { TicketCategory } from "@/app/events/[id]/page";
 
 export interface Ticket {
   id: string;
@@ -32,6 +33,8 @@ export interface TicketResponse {
 export interface BuyTicketPayload {
   eventId: string;
   quantity: number;
+  ticketCategoryId?: string; // make optional
+  resaleTicketId?: string;
 }
 
 
@@ -61,4 +64,5 @@ export interface TicketResale {
   resaleCount: 1;
   soldTo: string;
   user: User;
+
 }

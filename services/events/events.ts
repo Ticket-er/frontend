@@ -33,6 +33,7 @@ export const createEvent = async (formData: FormData) => {
     const errorMessage =
       error.response?.data?.message || "Failed to create event";
     toast.error(errorMessage);
+    console.log(errorMessage)
     throw new Error(errorMessage);
   }
 };

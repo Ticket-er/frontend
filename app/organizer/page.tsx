@@ -11,18 +11,18 @@ import {
   Trash2,
   MoreVertical,
   Edit,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { currentUser, dummyEvents, formatPrice } from "@/lib/dummy-data";
+import { currentUser, formatPrice } from "@/lib/dummy-data";
 import { Header } from "@/components/layout/header";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import {
   useDeleteEvent,
   useOrganizerEvents,
-  useUpdateEvent,
 } from "@/services/events/events.queries";
 import { useEffect, useState } from "react";
 import { Event } from "@/types/events.type";
@@ -44,32 +44,45 @@ import {
 import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 
 export default function OrganizerDashboard() {
-  const { isLoading, user: currentUser } = useAuth();
+  const { isLoading: authLoading, user: currentUser } = useAuth();
   const router = useRouter();
-  const { data: organizerEventList } = useOrganizerEvents();
+  const { data: organizerEventList, isLoading: eventsLoading } = useOrganizerEvents();
   const { mutate: deleteEvent } = useDeleteEvent();
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteEventId, setDeleteEventId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!currentUser && !isLoading) {
-      router.push(
-        `/login?returnUrl=${encodeURIComponent(window.location.href)}`
-      );
+    if (!currentUser && !authLoading) {
+      router.push(`/login?returnUrl=${encodeURIComponent(window.location.href)}`);
       return;
     }
     if (currentUser && !["ORGANIZER"].includes(currentUser.role)) {
       router.push("/explore");
       return;
     }
-  }, [currentUser, router]);
+  }, [currentUser, authLoading, router]);
+
+  if (eventsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-[#1E88E5] mx-auto mb-4" />
+          <p className="text-lg text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   const organizerEvents = Array.isArray(organizerEventList)
-    ? organizerEventList.filter(
-        (event: Event) => currentUser && event.organizerId === currentUser.id
-      )
+    ? organizerEventList.filter((event: Event) => currentUser && event.organizerId === currentUser.id)
     : [];
+
+  // Safe calculations
+  const totalEvents = organizerEvents?.length || 0;
+  const totalTicketsSold = organizerEvents?.reduce((sum, event) => sum + (event.minted || 0), 0) || 0;
+  const totalRevenue = organizerEvents?.reduce((sum, event) => sum + ((event.minted || 0) * (event.price || 0)), 0) || 0;
+  const avgTicketsSold = totalEvents > 0 ? Math.round(totalTicketsSold / totalEvents) : 0;
 
   const handleDeleteClick = (eventId: string) => {
     setDeleteEventId(eventId);
@@ -95,19 +108,6 @@ export default function OrganizerDashboard() {
     setIsDeleteDialogOpen(false);
     setDeleteEventId(null);
   };
-
-  // Calculate stats
-  const totalEvents = organizerEvents?.length;
-  const totalTicketsSold = organizerEvents?.reduce(
-    (sum: number, event: Event) => sum + event.minted,
-    0
-  );
-  const totalRevenue = organizerEvents?.reduce(
-    (sum: number, event: Event) => sum + event.minted * event.price,
-    0
-  );
-  const avgTicketsSold =
-    totalEvents > 0 ? Math.round(totalTicketsSold / totalEvents) : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -151,9 +151,7 @@ export default function OrganizerDashboard() {
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl sm:text-2xl font-bold">
-                    {organizerEvents?.length}
-                  </div>
+                  <div className="text-xl sm:text-2xl font-bold">{totalEvents}</div>
                   <p className="text-xs text-muted-foreground">Active events</p>
                 </CardContent>
               </Card>
@@ -173,9 +171,7 @@ export default function OrganizerDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl sm:text-2xl font-bold">{totalTicketsSold}</div>
-                  <p className="text-xs text-muted-foreground">
-                    Across all events
-                  </p>
+                  <p className="text-xs text-muted-foreground">Across all events</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -237,10 +233,10 @@ export default function OrganizerDashboard() {
                           </p>
                           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 text-xs sm:text-sm">
                             <span className="text-muted-foreground">
-                              {event.minted}/{event.maxTickets} sold
+                              {(event.minted || 0)}/{event.maxTickets || 0} sold
                             </span>
                             <span className="text-green-600 font-medium">
-                              ₦{(event.minted * event.price).toLocaleString()} revenue
+                              ₦{((event.minted || 0) * (event.price || 0)).toLocaleString()} revenue
                             </span>
                           </div>
                         </div>
@@ -258,9 +254,7 @@ export default function OrganizerDashboard() {
                             >
                               <DropdownMenuItem
                                 onClick={() =>
-                                  router.push(
-                                    `/organizer/update-event/${event.id}`
-                                  )
+                                  router.push(`/organizer/update-event/${event.id}`)
                                 }
                                 className="text-sm text-gray-700 hover:bg-gray-100 rounded-md p-2 transition-colors focus:outline-none flex items-center cursor-pointer"
                               >
@@ -279,12 +273,12 @@ export default function OrganizerDashboard() {
                             <div
                               className="bg-gradient-to-r from-blue-600 to-pink-600 h-2 rounded-full"
                               style={{
-                                width: `${(event.minted / event.maxTickets) * 100}%`,
+                                width: `${event.maxTickets ? ((event.minted || 0) / event.maxTickets) * 100 : 0}%`,
                               }}
                             />
                           </div>
                           <p className="text-xs sm:text-sm text-muted-foreground mt-1 text-right">
-                            {Math.round((event.minted / event.maxTickets) * 100)}% sold
+                            {event.maxTickets ? Math.round(((event.minted || 0) / event.maxTickets) * 100) : 0}% sold
                           </p>
                         </div>
                       </motion.div>
@@ -293,9 +287,7 @@ export default function OrganizerDashboard() {
                 ) : (
                   <div className="text-center py-8">
                     <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">
-                      No events yet
-                    </h3>
+                    <h3 className="text-lg font-semibold mb-2">No events yet</h3>
                     <p className="text-muted-foreground mb-4">
                       Create your first event to start selling tickets and managing attendees.
                     </p>

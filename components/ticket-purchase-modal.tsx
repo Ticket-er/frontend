@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Minus, CreditCard, Lock } from "lucide-react";
+import { X, Plus, Minus, Lock } from "lucide-react";
 import { formatDate, formatPrice, formatTime } from "@/lib/dummy-data";
 import { useAuth } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
+import { TicketCategory } from "@/app/events/[id]/page";
+import { TicketResale } from "@/types/tickets.type";
 
 interface Event {
   id: string;
@@ -22,12 +23,16 @@ interface Event {
 
 interface TicketPurchaseModalProps {
   event: Event;
-  isOpen: boolean;
+  ticketCategory?: TicketCategory | null;
+  resaleTicket?: TicketResale | null;  
+  isOpen: boolean;  
   onClose: () => void;
 }
 
 export function TicketPurchaseModal({
   event,
+  ticketCategory,
+  resaleTicket,
   isOpen,
   onClose,
 }: TicketPurchaseModalProps) {
@@ -36,11 +41,12 @@ export function TicketPurchaseModal({
   const [step, setStep] = useState<"quantity" | "auth" | "payment" | "success">(
     "quantity"
   );
-  const [isLoggedIn] = useState(false); // Simulate auth state
+
   const { mutateAsync: buyTicket, isPending: isBuying } = useBuyTicket();
 
-  const subtotal = event.price * ticketQuantity;
-  const total = subtotal;
+  const price = resaleTicket?.resalePrice ?? ticketCategory?.price ?? event.price ?? 0;
+  const subtotal = price * ticketQuantity;
+  const total = subtotal; // add tax/fees if needed
 
   const handleContinue = () => {
     if (!user) {
@@ -51,21 +57,32 @@ export function TicketPurchaseModal({
   };
 
   const handlePurchase = async () => {
-    try {
-      const data = await buyTicket({
-        eventId: event.id,
-        quantity: ticketQuantity,
-      });
+  if (!ticketCategory && !resaleTicket) {
+    toast.error("Please select a ticket category.");
+    return;
+  }
 
-      if (data?.checkoutUrl) {
-        window.open(data.checkoutUrl); // opens in new tab
-      } else {
-        console.error("No checkout URL returned from buyTicket.");
-      }
-    } catch (err) {
-      // Handle error (e.g., show notification)
+  // Build payload including eventId
+  const payload: any = resaleTicket
+    ? { eventId: event.id, resaleTicketId: resaleTicket.id, quantity: ticketQuantity }
+    : { eventId: event.id, ticketCategoryId: ticketCategory?.id, quantity: ticketQuantity };
+
+  console.log("Purchase payload:", payload); // log payload
+
+  try {
+    const data = await buyTicket(payload);
+
+    if (data?.checkoutUrl) {
+      window.open(data.checkoutUrl); // opens in new tab
+    } else {
+      console.error("No checkout URL returned from buyTicket.");
     }
-  };
+  } catch (err) {
+    console.error("Purchase failed:", err);
+    toast.error("Purchase failed. Try again.");
+  }
+};
+
 
   const resetModal = () => {
     setStep("quantity");
@@ -82,7 +99,7 @@ export function TicketPurchaseModal({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={resetModal}
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           />
 
@@ -123,8 +140,7 @@ export function TicketPurchaseModal({
                       {event.name}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      {formatDate(event.date)} • {formatTime(event.date)} •{" "}
-                      {event.location}
+                      {formatDate(event.date)} • {formatTime(event.date)} • {event.location}
                     </p>
                   </div>
 
@@ -171,7 +187,7 @@ export function TicketPurchaseModal({
                   <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">
-                        {ticketQuantity} × {formatPrice(event.price)}
+                        {ticketQuantity} × {formatPrice(price)}
                       </span>
                       <span className="text-gray-900">
                         {formatPrice(subtotal)}
@@ -207,8 +223,7 @@ export function TicketPurchaseModal({
                       Sign in to complete your purchase
                     </h3>
                     <p className="text-gray-600">
-                      You need to be signed in to buy tickets and access your
-                      digital tickets.
+                      You need to be signed in to buy tickets and access your digital tickets.
                     </p>
                   </div>
 
@@ -289,8 +304,7 @@ export function TicketPurchaseModal({
                       Tickets purchased successfully!
                     </h3>
                     <p className="text-gray-600">
-                      Your tickets have been sent to your email and are
-                      available in your account.
+                      Your tickets have been sent to your email and are available in your account.
                     </p>
                   </div>
 
