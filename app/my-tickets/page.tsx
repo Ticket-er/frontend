@@ -12,18 +12,11 @@ import {
   useMyTickets,
   useListResale,
 } from "@/services/tickets/tickets.queries";
-import { Ticket } from "@/types/tickets.type";
+import { Ticket, ListResalePayload } from "@/types/tickets.type";
 import { formatDate, formatPrice } from "@/lib/dummy-data";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-
-export interface ListResalePayload {
-  ticketId: string;
-  resalePrice: number;
-  bankCode: string;
-  accountNumber: string;
-}
 
 export default function MyTicketsPage() {
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
@@ -40,13 +33,15 @@ export default function MyTicketsPage() {
       router.push(
         `/login?returnUrl=${encodeURIComponent(window.location.href)}`
       );
-      return;
     }
-  }, [currentUser, router]);
+  }, [currentUser, isLoading, router]);
+
+  console.log(userTickets);
+
   // Group tickets by event ID
   const groupedTickets = userTickets?.reduce(
     (acc, ticket) => {
-      const eventId = ticket.event.id;
+      const eventId = ticket.eventId;
       if (!acc[eventId]) {
         acc[eventId] = {
           event: ticket.event,
@@ -75,6 +70,12 @@ export default function MyTicketsPage() {
 
   const handleListForResale = (ticket: Ticket, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (ticket.resaleCount >= 1) {
+      toast.error(
+        "This ticket has already been resold once and cannot be listed again."
+      );
+      return;
+    }
     setSelectedTicket(ticket);
     setIsResaleModalOpen(true);
   };
@@ -96,12 +97,20 @@ export default function MyTicketsPage() {
       accountNumber: payload.accountNumber,
     };
 
-    await listResale(resalePayload, {
-      onSuccess: () => {
-        setIsResaleModalOpen(false);
-        setSelectedTicket(null);
-      },
-    });
+    try {
+      await listResale(resalePayload, {
+        onSuccess: () => {
+          toast.success("Ticket listed for resale successfully!");
+          setIsResaleModalOpen(false);
+          setSelectedTicket(null);
+        },
+        onError: (error) => {
+          toast.error(error.message || "Failed to list ticket for resale.");
+        },
+      });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to list ticket for resale.");
+    }
   };
 
   const getStatusColor = (ticket: { isUsed: boolean; isListed: boolean }) => {
@@ -234,14 +243,6 @@ export default function MyTicketsPage() {
                               Tickets: {ticketCount}
                             </span>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm text-gray-600">
-                              Original Price:
-                            </span>
-                            <span className="font-semibold">
-                              {formatPrice(event.price)}
-                            </span>
-                          </div>
                         </div>
 
                         <Button
@@ -286,7 +287,23 @@ export default function MyTicketsPage() {
                                     >
                                       {getStatusText(ticket)}
                                     </Badge>
+                                    {ticket.ticketCategory && (
+                                      <p className="text-xs text-gray-600 mt-1">
+                                        Category: {ticket.ticketCategory.name}
+                                      </p>
+                                    )}
+                                    <div className="flex items-center space-x-2">
+                                      <span className="text-sm text-gray-600">
+                                        Original Price:
+                                      </span>
+                                      <span className="font-semibold">
+                                        {formatPrice(
+                                          ticket?.ticketCategory?.price ?? 0
+                                        )}
+                                      </span>
+                                    </div>
                                   </div>
+
                                   {!ticket.isListed && !ticket.isUsed && (
                                     <Button
                                       className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
@@ -302,8 +319,8 @@ export default function MyTicketsPage() {
                                       className="bg-[#1E88E5] hover:bg-blue-500 text-white rounded-full px-6 shadow-lg hover:shadow-xl transition-all duration-300"
                                       disabled
                                     >
-                                      Listed for ₦
-                                      {ticket.resalePrice?.toLocaleString()}
+                                      Listed for
+                                      {formatPrice(ticket.resalePrice ?? 0)}
                                     </Button>
                                   )}
                                 </div>

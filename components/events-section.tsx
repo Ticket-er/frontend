@@ -38,7 +38,7 @@ export function EventsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
-              onClick={() => router.push(`/events/${event.id}`)}
+              onClick={() => router.push(`/events/${event.slug}`)}
               className="cursor-pointer group"
             >
               <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">

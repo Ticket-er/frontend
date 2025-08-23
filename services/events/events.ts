@@ -92,6 +92,12 @@ export const getEventById = async (eventId: string) => {
   return res.data;
 };
 
+// FETCH event by SLUG
+export const getEventBySlug = async (slug: string) => {
+  const res = await axios.get(`/events/slug/${slug}`);
+  return res.data;
+};
+
 // FETCH user events
 export const getUserEvents = async () => {
   const res = await axios.get("/events/user/my");

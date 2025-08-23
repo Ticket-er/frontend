@@ -17,6 +17,7 @@ import { ArrowLeft, ArrowRight, Upload, Check, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
+import { formatPrice } from "@/lib/dummy-data";
 
 // Valid event categories (title case for UI display)
 const categories = [
@@ -726,18 +727,18 @@ export default function UpdateEventPage() {
                             <div key={cat.id} className="space-y-1">
                               <div className="flex justify-between">
                                 <span>{cat.name} Price:</span>
-                                <span>₦{cat.price.toLocaleString()}</span>
+                                <span>{formatPrice(cat.price)}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span>Platform Fee (5%):</span>
                                 <span>
-                                  ₦{Math.round(cat.price * 0.05).toLocaleString()}
+                                  {formatPrice(Math.round(cat.price * 0.05))}
                                 </span>
                               </div>
                               <div className="flex justify-between font-medium border-t border-blue-300 pt-1">
                                 <span>You receive per {cat.name} ticket:</span>
                                 <span>
-                                  ₦{Math.round(cat.price * 0.95).toLocaleString()}
+                                  {formatPrice(Math.round(cat.price * 0.95))}
                                 </span>
                               </div>
                             </div>
@@ -796,7 +797,7 @@ export default function UpdateEventPage() {
                             <span className="text-gray-600">Ticket Categories:</span>
                             {ticketCategories.map((cat) => (
                               <p key={cat.id} className="font-medium">
-                                {cat.name}: ₦{cat.price.toLocaleString()} ({cat.maxTickets} tickets)
+                                {cat.name}: {formatPrice(cat.price)} ({cat.maxTickets} tickets)
                               </p>
                             ))}
                           </div>
@@ -824,13 +825,13 @@ export default function UpdateEventPage() {
                           <div className="flex justify-between">
                             <span>If all tickets sell:</span>
                             <span className="font-medium">
-                              ₦
-                              {ticketCategories
+                              
+                              {formatPrice(ticketCategories
                                 .reduce(
                                   (sum, cat) => sum + cat.price * cat.maxTickets * 0.95,
                                   0
-                                )
-                                .toLocaleString()}
+                                ))
+                                }
                             </span>
                           </div>
                         </div>

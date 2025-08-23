@@ -261,7 +261,7 @@ export default function EventDashboard() {
                         {ticketsSold}/{totalTickets} sold
                       </span>
                       <span className="text-green-600 font-medium">
-                        ₦{totalRevenue.toLocaleString()} revenue
+                        {formatPrice(totalRevenue)} revenue
                       </span>
                     </div>
                   </div>

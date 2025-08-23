@@ -182,7 +182,7 @@ export function PayoutModal({
             <div className="w-full">
               <p className="text-sm text-gray-600">Available Balance</p>
               <p className="text-2xl font-bold text-gray-900">
-                ₦{formatPrice(availableBalance)}
+                {formatPrice(availableBalance)}
               </p>
             </div>
             <div className="w-full">
@@ -214,7 +214,7 @@ export function PayoutModal({
                   <SelectValue placeholder="Select a bank" />
                 </SelectTrigger>
                 <SelectContent>
-                  {banks.map((bank: Bank) => (
+                  {banks && banks?.map((bank: Bank) => (
                     <SelectItem key={bank.code} value={bank.code}>
                       {bank.name}
                     </SelectItem>

@@ -28,6 +28,15 @@ export const useEventById = (eventId: string) => {
   });
 };
 
+export const useEventBySlug = (slug: string) => {
+  return useQuery({
+    queryKey: ["event", slug],
+    queryFn: () => eventsAPI.getEventBySlug(slug),
+    enabled: !!slug, 
+    retry: 1,
+  });
+};
+
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
   return useMutation({

@@ -71,6 +71,7 @@ export default function EventsPage() {
     "Party",
   ];
 
+
   const filteredEvents = events?.filter((event: Event) => {
     const matchesSearch =
       event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -267,7 +268,7 @@ export default function EventsPage() {
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
                 className="group"
               >
-                <Link href={`/events/${event.id}`}>
+                <Link href={`/events/${event.slug}`}>
                   <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
                     {/* Image */}
                     <div className="relative">

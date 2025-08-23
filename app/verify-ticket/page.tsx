@@ -252,7 +252,7 @@ export default function VerifyTicketPage() {
                     <div>
                       <span className="text-gray-600">Original Price:</span>
                       <p className="font-semibold text-gray-900">
-                        ₦{formatPrice(event?.price || 0)}
+                        {formatPrice(event?.price || 0)}
                       </p>
                     </div>
                     <div>
@@ -277,7 +277,7 @@ export default function VerifyTicketPage() {
                       <div>
                         <span className="text-gray-600">Listed for:</span>
                         <p className="font-semibold text-orange-600">
-                          ₦{formatPrice(ticket.resalePrice)}
+                          {formatPrice(ticket.resalePrice)}
                         </p>
                       </div>
                     )}

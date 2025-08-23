@@ -1,7 +1,14 @@
-import { Ticket } from "lucide-react";
+import { Ticket as TicketIcon } from "lucide-react";
 import { Event } from "./events.type";
 import { User } from "./user.type";
-import { TicketCategory } from "@/app/events/[id]/page";
+
+export interface TicketCategory {
+  id: string;
+  name: string;
+  price: number;
+  minted: number;
+  maxTickets: number;
+}
 
 export interface Ticket {
   id: string;
@@ -17,11 +24,12 @@ export interface Ticket {
   event: Event;
   isListed: boolean;
   isUsed: boolean;
-  listedAt: Date;
-  resaleCommission: 225;
-  resaleCount: 1;
-  soldTo: string;
+  listedAt?: Date;
+  resaleCommission: number;
+  resaleCount: number;
+  soldTo?: string;
   user: User;
+  ticketCategory?: TicketCategory; // Added to align with backend schema
 }
 
 export interface TicketResponse {
@@ -30,13 +38,16 @@ export interface TicketResponse {
   checkoutUrl: string;
 }
 
-export interface BuyTicketPayload {
-  eventId?: string;
+export interface TicketCategoryItem {
+  ticketCategoryId: string;
   quantity: number;
-  ticketCategoryId?: string; // make optional
-  resaleTicketId?: string;
 }
 
+export interface BuyTicketPayload {
+  eventId?: string;
+  ticketCategories?: TicketCategoryItem[];
+  resaleTicketId?: string;
+}
 
 export interface ListResalePayload {
   ticketId: string;
@@ -59,10 +70,10 @@ export interface TicketResale {
   event: Event;
   isListed: boolean;
   isUsed: boolean;
-  listedAt: Date;
-  resaleCommission: 225;
-  resaleCount: 1;
-  soldTo: string;
+  listedAt?: Date;
+  resaleCommission: number;
+  resaleCount: number;
+  soldTo?: string;
   user: User;
-
+  ticketCategory?: TicketCategory; // Added to align with backend schema
 }

@@ -236,7 +236,7 @@ export default function OrganizerDashboard() {
                               {(event.minted || 0)}/{event.maxTickets || 0} sold
                             </span>
                             <span className="text-green-600 font-medium">
-                              ₦{((event.minted || 0) * (event.price || 0)).toLocaleString()} revenue
+                              {formatPrice((event.minted || 0) * (event.price || 0)).toLocaleString()} revenue
                             </span>
                           </div>
                         </div>

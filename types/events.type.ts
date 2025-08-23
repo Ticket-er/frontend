@@ -34,6 +34,7 @@ export interface Event {
   organizerId: string;
   createdAt: string;
   updatedAt: string;
+  slug: string;
   maxTickets: number;
   minted: number;
   organizerd: string;

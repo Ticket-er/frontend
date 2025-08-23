@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
 import { TicketCategory } from "@/app/events/[id]/page";
-import { BuyTicketPayload, TicketResale } from "@/types/tickets.type";
+import { BuyTicketPayload, TicketResale, TicketCategoryItem } from "@/types/tickets.type";
 
 interface Event {
   id: string;
@@ -23,34 +23,46 @@ interface Event {
 
 interface TicketPurchaseModalProps {
   event: Event;
-  ticketCategory?: TicketCategory | null;
-  resaleTicket?: TicketResale | null;  
-  isOpen: boolean;  
-  quantity: number
-  setQuantity: React.Dispatch<React.SetStateAction<number>>; // add this
+  ticketCategories?: TicketCategory[];
+  resaleTicket?: TicketResale | null;
+  isOpen: boolean;
   onClose: () => void;
+  quantities: { [key: string]: number };
+  setQuantities: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
 }
 
 export function TicketPurchaseModal({
   event,
-  ticketCategory,
+  ticketCategories,
   resaleTicket,
   isOpen,
   onClose,
-  quantity,
-  setQuantity
+  quantities,
+  setQuantities,
 }: TicketPurchaseModalProps) {
   const { user } = useAuth();
-  const [ticketQuantity, setTicketQuantity] = useState(1);
-  const [step, setStep] = useState<"quantity" | "auth" | "payment" | "success">(
-    "quantity"
-  );
-
+  const [step, setStep] = useState<"quantity" | "auth" | "payment" | "success">("quantity");
   const { mutateAsync: buyTicket, isPending: isBuying } = useBuyTicket();
 
-  const price = resaleTicket?.resalePrice ?? ticketCategory?.price ?? event.price ?? 0;
-  const subtotal = price * ticketQuantity;
-  const total = subtotal; // add tax/fees if needed
+  const calculateSubtotal = () => {
+    if (resaleTicket) {
+      return (resaleTicket.resalePrice || 0) * (quantities[resaleTicket.id] || 1);
+    }
+    return ticketCategories?.reduce((sum, category) => {
+      const quantity = quantities[category.id] || 0;
+      return sum + (category.price * quantity);
+    }, 0) || 0;
+  };
+
+  const subtotal = calculateSubtotal();
+  const total = subtotal; // Add tax/fees if needed
+
+  const handleQuantityChange = (categoryId: string, delta: number) => {
+    setQuantities((prev) => {
+      const newQuantity = Math.max(1, Math.min(8, (prev[categoryId] || 1) + delta));
+      return { ...prev, [categoryId]: newQuantity };
+    });
+  };
 
   const handleContinue = () => {
     if (!user) {
@@ -59,40 +71,41 @@ export function TicketPurchaseModal({
       setStep("payment");
     }
   };
+
   const handlePurchase = async () => {
-  if (!ticketCategory && !resaleTicket) {
-    toast.error("Please select a ticket category.");
-    return;
-  }
+    if (!ticketCategories && !resaleTicket) {
+      toast.error("Please select a ticket category or resale ticket.");
+      return;
+    }
 
-  // Build payload depending on whether it's a resale or fresh ticket
-  const payload: BuyTicketPayload = resaleTicket
-    ? { resaleTicketId: resaleTicket.id, quantity: ticketQuantity }
-    : {
-        eventId: event.id,                  // required for new tickets
-        ticketCategoryId: ticketCategory!.id, // non-null assertion because we checked above
-        quantity: ticketQuantity,
-      };
+    const payload: BuyTicketPayload = resaleTicket
+      ? { resaleTicketId: resaleTicket.id, quantity: quantities[resaleTicket.id] || 1 }
+      : {
+          eventId: event.id,
+          ticketCategories: ticketCategories?.map((category) => ({
+            ticketCategoryId: category.id,
+            quantity: quantities[category.id] || 1,
+          })),
+        };
 
-  console.log("Purchase payload:", payload);
+    console.log("Purchase payload:", payload);
 
-  try {
-    const data = await buyTicket(payload);
+    try {
+      const data = await buyTicket(payload);
 
-    if (data?.checkoutUrl) {
-      console.log("Redirecting to checkout URL:", data.checkoutUrl);
-      window.open(data.checkoutUrl);
-    } 
-  } catch (err: any) {
-    console.error("Purchase failed:", err);
-    toast.error(err.message || "Purchase failed. Try again.");
-  }
-};
-
+      if (data?.checkoutUrl) {
+        console.log("Redirecting to checkout URL:", data.checkoutUrl);
+        window.open(data.checkoutUrl);
+      }
+    } catch (err: any) {
+      console.error("Purchase failed:", err);
+      toast.error(err.message || "Purchase failed. Try again.");
+    }
+  };
 
   const resetModal = () => {
     setStep("quantity");
-    setTicketQuantity(1);
+    setQuantities({});
     onClose();
   };
 
@@ -114,7 +127,7 @@ export function TicketPurchaseModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -142,73 +155,116 @@ export function TicketPurchaseModal({
                 >
                   {/* Event Info */}
                   <div className="bg-gray-50 rounded-xl p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      {event.name}
-                    </h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">{event.name}</h3>
                     <p className="text-sm text-gray-600">
                       {formatDate(event.date)} • {formatTime(event.date)} • {event.location}
                     </p>
                   </div>
 
                   {/* Quantity Selector */}
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-3 block">
-                      Number of tickets
-                    </Label>
-                    <div className="flex items-center justify-center space-x-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setTicketQuantity(Math.max(1, ticketQuantity - 1))
-                        }
-                        disabled={ticketQuantity <= 1}
-                        className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </Button>
-
-                      <div className="text-2xl font-bold text-gray-900 w-12 text-center">
-                        {ticketQuantity}
+                  {resaleTicket ? (
+                    <div>
+                      <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                        Number of Resale Tickets
+                      </Label>
+                      <div className="flex items-center justify-center space-x-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleQuantityChange(resaleTicket.id, -1)}
+                          disabled={(quantities[resaleTicket.id] || 1) <= 1}
+                          className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </Button>
+                        <div className="text-2xl font-bold text-gray-900 w-12 text-center">
+                          {quantities[resaleTicket.id] || 1}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleQuantityChange(resaleTicket.id, 1)}
+                          disabled={(quantities[resaleTicket.id] || 1) >= 8}
+                          className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </Button>
                       </div>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setTicketQuantity(Math.min(8, ticketQuantity + 1))
-                        }
-                        disabled={ticketQuantity >= 8}
-                        className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
+                      <p className="text-xs text-gray-500 text-center mt-2">
+                        Maximum 8 tickets per order
+                      </p>
                     </div>
-                    <p className="text-xs text-gray-500 text-center mt-2">
-                      Maximum 8 tickets per order
-                    </p>
-                  </div>
+                  ) : (
+                    ticketCategories?.map((category) => (
+                      <div key={category.id}>
+                        <Label className="text-sm font-medium text-gray-700 mb-3 block">
+                          {category.name} ({formatPrice(category.price)})
+                        </Label>
+                        <div className="flex items-center justify-center space-x-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuantityChange(category.id, -1)}
+                            disabled={(quantities[category.id] || 0) <= 0}
+                            className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </Button>
+                          <div className="text-2xl font-bold text-gray-900 w-12 text-center">
+                            {quantities[category.id] || 0}
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleQuantityChange(category.id, 1)}
+                            disabled={
+                              (quantities[category.id] || 0) >= 8 ||
+                              category.maxTickets - category.minted <= (quantities[category.id] || 0)
+                            }
+                            className="w-10 h-10 rounded-full border-gray-200 bg-transparent"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-500 text-center mt-2">
+                          {category.maxTickets - category.minted} tickets available
+                        </p>
+                      </div>
+                    ))
+                  )}
 
                   {/* Price Breakdown */}
                   <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">
-                        {ticketQuantity} × {formatPrice(price)}
-                      </span>
-                      <span className="text-gray-900">
-                        {formatPrice(subtotal)}
-                      </span>
-                    </div>
+                    {resaleTicket ? (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">
+                          {quantities[resaleTicket.id] || 1} × {formatPrice(resaleTicket.resalePrice || 0)}
+                        </span>
+                        <span className="text-gray-900">{formatPrice(subtotal)}</span>
+                      </div>
+                    ) : (
+                      ticketCategories?.map((category) => (
+                        quantities[category.id] > 0 && (
+                          <div key={category.id} className="flex justify-between text-sm">
+                            <span className="text-gray-600">
+                              {quantities[category.id]} × {category.name} ({formatPrice(category.price)})
+                            </span>
+                            <span className="text-gray-900">
+                              {formatPrice(category.price * quantities[category.id])}
+                            </span>
+                          </div>
+                        )
+                      ))
+                    )}
                     <div className="border-t border-gray-200 pt-2 flex justify-between font-semibold">
                       <span className="text-gray-900">Total</span>
-                      <span className="text-gray-900">
-                        {formatPrice(total)}
-                      </span>
+                      <span className="text-gray-900">{formatPrice(total)}</span>
                     </div>
                   </div>
 
                   <Button
                     onClick={handleContinue}
+                    disabled={resaleTicket ? false : !ticketCategories?.some((cat) => quantities[cat.id] > 0)}
                     className="w-full h-12 bg-[#1E88E5] hover:bg-blue-500 text-white font-semibold rounded-xl"
                   >
                     Continue to Checkout
@@ -265,11 +321,11 @@ export function TicketPurchaseModal({
                   {/* Order Summary */}
                   <div className="bg-gray-50 rounded-xl p-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-gray-900">
-                        {event.name}
-                      </span>
+                      <span className="font-medium text-gray-900">{event.name}</span>
                       <Badge variant="secondary">
-                        {ticketQuantity} tickets
+                        {resaleTicket
+                          ? `${quantities[resaleTicket.id] || 1} tickets`
+                          : `${Object.values(quantities).reduce((sum, qty) => sum + qty, 0)} tickets`}
                       </Badge>
                     </div>
                     <div className="text-sm text-gray-600 mb-3">
@@ -282,9 +338,7 @@ export function TicketPurchaseModal({
 
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Lock className="w-4 h-4" />
-                    <span>
-                      Your payment information is secure and encrypted
-                    </span>
+                    <span>Your payment information is secure and encrypted</span>
                   </div>
 
                   <Button
