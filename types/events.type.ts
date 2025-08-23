@@ -13,6 +13,14 @@ export interface ResaleTicket {
   createdAt: string;
 }
 
+export interface TicketCategory {
+  id: string;
+  name: string;
+  price: number;
+  maxTickets: number;
+  minted: number;
+}
+
 export interface Event {
   id: string;
   name: string;
@@ -29,8 +37,8 @@ export interface Event {
   maxTickets: number;
   minted: number;
   organizerd: string;
-
   tickets: ResaleTicket[]; 
+  ticketCategories? :  TicketCategory[]
 }
 
 export interface CreateEventDTO {
