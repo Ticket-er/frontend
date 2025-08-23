@@ -14,6 +14,7 @@ import {
   Search,
   SlidersHorizontal,
   Loader2,
+  Ticket,
 } from "lucide-react";
 import { formatPrice, formatDate, formatTime } from "@/lib/dummy-data";
 import { useAllEvents } from "@/services/events/events.queries";
@@ -84,7 +85,7 @@ export default function EventsPage() {
 
     let matchesPrice = true;
     if (priceRange) {
-      const price = event.price ? event.price / 100 : 0; // Default to 0 if price is undefined
+      const price = event.price ? event.price / 100 : 0;
       switch (priceRange) {
         case "0-5000":
           matchesPrice = price < 50;
@@ -236,9 +237,36 @@ export default function EventsPage() {
         {/* Events Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredEvents?.map((event: Event, index: number) => {
-            const minted = event.minted || 0; // Default to 0 if undefined
-            const maxTickets = event.maxTickets || 0; // Default to 0 if undefined
+            const minted = event.minted || 0;
+            const maxTickets = event.maxTickets || 0;
             const ticketsAvailable = maxTickets - minted;
+
+            // Define ticket categories with availability and prices
+            const ticketCategories = [
+              {
+                type: "General",
+                price: event.price ? event.price / 100 : 0,
+                available: Math.floor(ticketsAvailable * 0.6),
+                total: Math.floor(maxTickets * 0.6),
+              },
+              {
+                type: "VIP",
+                price: event.price ? (event.price / 100) * 1.5 : 0,
+                available: Math.floor(ticketsAvailable * 0.3),
+                total: Math.floor(maxTickets * 0.3),
+              },
+              {
+                type: "Premium",
+                price: event.price ? (event.price / 100) * 2 : 0,
+                available: Math.floor(ticketsAvailable * 0.1),
+                total: Math.floor(maxTickets * 0.1),
+              },
+            ];
+
+            // Calculate price range for display
+            const priceRangeDisplay = event.price
+              ? `${formatPrice(Math.min(...ticketCategories.map(t => t.price * 100)))} - ${formatPrice(Math.max(...ticketCategories.map(t => t.price * 100)))}`
+              : "Free";
 
             return (
               <motion.div
@@ -259,7 +287,7 @@ export default function EventsPage() {
                         className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                       />
                       <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
-                        {formatPrice(event.price || 0)}
+                        {priceRangeDisplay}
                       </div>
                       <div className="absolute top-4 left-4 capitalize bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-semibold text-blue-600">
                         {event.category}
@@ -291,11 +319,28 @@ export default function EventsPage() {
                             {event.location}
                           </span>
                         </div>
-                        <div className="flex items-center text-gray-600">
-                          <Users className="w-4 h-4 mr-2 flex-shrink-0" />
-                          <span className="text-sm">
-                            {ticketsAvailable} tickets available
-                          </span>
+                        <div className="text-gray-600">
+                          <div className="flex items-center mb-1">
+                            <Ticket className="w-4 h-4 mr-2 flex-shrink-0" />
+                            <span className="text-sm font-medium">Ticket Options</span>
+                          </div>
+                          {ticketCategories.map((ticket, idx) => (
+                            <div
+                              key={idx}
+                              className="flex justify-between items-center text-sm pl-6"
+                            >
+                              <span>{ticket.type} ({formatPrice(ticket.price * 100)})</span>
+                              <span
+                                className={
+                                  ticket.available < 5
+                                    ? "text-red-500 font-medium"
+                                    : "text-gray-600"
+                                }
+                              >
+                                {ticket.available} of {ticket.total} available
+                              </span>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
