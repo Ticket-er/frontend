@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useBuyTicket } from "@/services/tickets/tickets.queries";
 import { toast } from "sonner";
 import { TicketCategory } from "@/app/events/[id]/page";
-import { TicketResale } from "@/types/tickets.type";
+import { BuyTicketPayload, TicketResale } from "@/types/tickets.type";
 
 interface Event {
   id: string;
@@ -26,6 +26,8 @@ interface TicketPurchaseModalProps {
   ticketCategory?: TicketCategory | null;
   resaleTicket?: TicketResale | null;  
   isOpen: boolean;  
+  quantity: number
+  setQuantity: React.Dispatch<React.SetStateAction<number>>; // add this
   onClose: () => void;
 }
 
@@ -35,6 +37,8 @@ export function TicketPurchaseModal({
   resaleTicket,
   isOpen,
   onClose,
+  quantity,
+  setQuantity
 }: TicketPurchaseModalProps) {
   const { user } = useAuth();
   const [ticketQuantity, setTicketQuantity] = useState(1);
@@ -55,31 +59,33 @@ export function TicketPurchaseModal({
       setStep("payment");
     }
   };
-
   const handlePurchase = async () => {
   if (!ticketCategory && !resaleTicket) {
     toast.error("Please select a ticket category.");
     return;
   }
 
-  // Build payload including eventId
-  const payload: any = resaleTicket
-    ? { eventId: event.id, resaleTicketId: resaleTicket.id, quantity: ticketQuantity }
-    : { eventId: event.id, ticketCategoryId: ticketCategory?.id, quantity: ticketQuantity };
+  // Build payload depending on whether it's a resale or fresh ticket
+  const payload: BuyTicketPayload = resaleTicket
+    ? { resaleTicketId: resaleTicket.id, quantity: ticketQuantity }
+    : {
+        eventId: event.id,                  // required for new tickets
+        ticketCategoryId: ticketCategory!.id, // non-null assertion because we checked above
+        quantity: ticketQuantity,
+      };
 
-  console.log("Purchase payload:", payload); // log payload
+  console.log("Purchase payload:", payload);
 
   try {
     const data = await buyTicket(payload);
 
     if (data?.checkoutUrl) {
-      window.open(data.checkoutUrl); // opens in new tab
-    } else {
-      console.error("No checkout URL returned from buyTicket.");
-    }
-  } catch (err) {
+      console.log("Redirecting to checkout URL:", data.checkoutUrl);
+      window.open(data.checkoutUrl);
+    } 
+  } catch (err: any) {
     console.error("Purchase failed:", err);
-    toast.error("Purchase failed. Try again.");
+    toast.error(err.message || "Purchase failed. Try again.");
   }
 };
 

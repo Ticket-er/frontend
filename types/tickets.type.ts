@@ -31,7 +31,7 @@ export interface TicketResponse {
 }
 
 export interface BuyTicketPayload {
-  eventId: string;
+  eventId?: string;
   quantity: number;
   ticketCategoryId?: string; // make optional
   resaleTicketId?: string;
