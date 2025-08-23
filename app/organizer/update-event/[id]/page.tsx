@@ -13,11 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, Upload, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, Upload, Check, Trash2 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useQuery } from "@tanstack/react-query";
-import { UpdateEventDTO } from "@/types/events.type";
 
 // Valid event categories (title case for UI display)
 const categories = [
@@ -43,7 +42,7 @@ const uppercaseCategories = categories.map((cat) => cat.toUpperCase()) as [
   ...string[]
 ];
 
-// Zod Schema
+// Zod Schema for frontend form handling (includes id for React state)
 const updateEventSchema = z.object({
   name: z.string().min(3, "Event name is required"),
   description: z.string().min(10, "Description is required"),
@@ -56,8 +55,46 @@ const updateEventSchema = z.object({
     .min(1, "Date is required")
     .refine((val) => new Date(val) >= new Date(), "Date cannot be in the past"),
   time: z.string().min(1, "Time is required"),
-  price: z.coerce.number().min(0, "Price is required"),
-  quantity: z.coerce.number().min(1, "Total tickets must be at least 1"),
+  ticketCategories: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string().min(3, "Category name is required"),
+        price: z.coerce.number().min(0, "Price must be non-negative"),
+        maxTickets: z.coerce.number().min(1, "At least 1 ticket is required"),
+      })
+    )
+    .min(1, "At least one ticket category is required"),
+  banner: z
+    .any()
+    .refine(
+      (file) => !file || file.size <= 10 * 1024 * 1024,
+      "File size must be ≤10MB"
+    )
+    .refine(
+      (file) => !file || ["image/png", "image/jpeg"].includes(file.type),
+      "File must be PNG or JPG"
+    )
+    .optional(),
+});
+
+// Zod Schema for backend submission (excludes id)
+const submissionSchema = z.object({
+  name: z.string().min(3, "Event name is required"),
+  description: z.string().min(10, "Description is required"),
+  category: z.enum(uppercaseCategories),
+  location: z.string().min(3, "Location is required"),
+  date: z.string().min(1, "Date is required"),
+  time: z.string().min(1, "Time is required"),
+  ticketCategories: z
+    .array(
+      z.object({
+        name: z.string().min(3, "Category name is required"),
+        price: z.coerce.number().min(0, "Price must be non-negative"),
+        maxTickets: z.coerce.number().min(1, "At least 1 ticket is required"),
+      })
+    )
+    .min(1, "At least one ticket category is required"),
   banner: z
     .any()
     .refine(
@@ -109,8 +146,7 @@ export default function UpdateEventPage() {
       location: "",
       date: "",
       time: "",
-      price: 0,
-      quantity: 1,
+      ticketCategories: [{ id: "1", name: "Regular", price: 0, maxTickets: 1 }],
       banner: undefined,
     },
   });
@@ -128,8 +164,18 @@ export default function UpdateEventPage() {
       setValue("location", event.location);
       setValue("date", date);
       setValue("time", time);
-      setValue("price", event.price);
-      setValue("quantity", event.maxTickets);
+      // Populate ticketCategories, assuming event.ticketCategories exists
+      setValue(
+        "ticketCategories",
+        event.ticketCategories?.length
+          ? event.ticketCategories.map((cat: any, index: any) => ({
+              id: (index + 1).toString(),
+              name: cat.name,
+              price: cat.price,
+              maxTickets: cat.maxTickets,
+            }))
+          : [{ id: "1", name: "Regular", price: event.price || 0, maxTickets: event.maxTickets || 1 }]
+      );
     }
   }, [event, eventLoading, setValue]);
 
@@ -160,30 +206,45 @@ export default function UpdateEventPage() {
     };
   }, [previewUrl, watch]);
 
+  const ticketCategories = watch("ticketCategories") || [];
   const canProceedStep1 =
     watch("name") && watch("description") && watch("category");
   const canProceedStep2 =
     watch("location") &&
     watch("date") &&
     watch("time") &&
-    watch("price") !== undefined &&
-    watch("quantity");
+    ticketCategories.length > 0 &&
+    ticketCategories.every(
+      (cat) => cat.name && cat.price >= 0 && cat.maxTickets >= 1
+    );
+
   const onSubmit = async (data: UpdateEventForm) => {
-    const fullDate = `${data.date}T${data.time}:00`;
+    // Map ticketCategories to exclude id for backend submission
+    const submissionData = {
+      ...data,
+      ticketCategories: data.ticketCategories.map(({ id, ...rest }) => rest),
+    };
 
-    // Always use FormData for consistency with backend multipart expectation
+    // Validate submission data
+    const validatedData = submissionSchema.parse(submissionData);
+
+    const fullDate = new Date(`${validatedData.date}T${validatedData.time}`);
+    const isoDate = fullDate.toISOString();
     const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("description", data.description);
-    formData.append("category", data.category);
-    formData.append("location", data.location);
-    formData.append("date", fullDate);
-    formData.append("price", String(data.price));
-    formData.append("maxTickets", String(data.quantity)); // 👈 Add this to send quantity as maxTickets
+    formData.append("name", validatedData.name);
+    formData.append("description", validatedData.description);
+    formData.append("category", validatedData.category);
+    formData.append("location", validatedData.location);
+    formData.append("date", isoDate);
+    formData.append("ticketCategories", JSON.stringify(validatedData.ticketCategories));
+    if (validatedData.banner instanceof File) {
+      formData.append("file", validatedData.banner);
+    }
 
-    // Conditionally append file if a new banner is selected
-    if (data.banner instanceof File) {
-      formData.append("file", data.banner);
+    // Log FormData for debugging
+    console.log("FormData being sent:");
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
     }
 
     try {
@@ -193,9 +254,25 @@ export default function UpdateEventPage() {
       console.error("Event update failed:", error);
     }
   };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) setValue("banner", file);
+  };
+
+  const handleAddCategory = () => {
+    const newId = (ticketCategories.length + 1).toString();
+    const newCategories = [
+      ...ticketCategories,
+      { id: newId, name: "", price: 0, maxTickets: 1 },
+    ];
+    setValue("ticketCategories", newCategories);
+  };
+
+  const handleRemoveCategory = (id: string) => {
+    if (ticketCategories.length === 1) return; // Prevent removing the last category
+    const newCategories = ticketCategories.filter((cat) => cat.id !== id);
+    setValue("ticketCategories", newCategories);
   };
 
   const handleNext = () => {
@@ -214,7 +291,16 @@ export default function UpdateEventPage() {
   };
 
   const handleCreateAnother = () => {
-    reset();
+    reset({
+      name: "",
+      description: "",
+      category: "",
+      location: "",
+      date: "",
+      time: "",
+      ticketCategories: [{ id: "1", name: "Regular", price: 0, maxTickets: 1 }],
+      banner: undefined,
+    });
     setCurrentStep(1);
     setIsSubmitted(false);
     router.push("/organizer/create");
@@ -417,13 +503,7 @@ export default function UpdateEventPage() {
                                 : "outline"
                             }
                             size="sm"
-                            onClick={() => {
-                              setValue("category", category.toUpperCase());
-                              console.log(
-                                "Category selected:",
-                                category.toUpperCase()
-                              );
-                            }}
+                            onClick={() => setValue("category", category.toUpperCase())}
                             className={
                               watch("category") === category.toUpperCase()
                                 ? "bg-[#1E88E5] hover:bg-blue-500 text-white"
@@ -473,10 +553,7 @@ export default function UpdateEventPage() {
                           variant="outline"
                           size="sm"
                           className="mt-2 bg-transparent"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            document.getElementById("banner")?.click();
-                          }}
+                          onClick={() => document.getElementById("banner")?.click()}
                           disabled={isPending || isSubmitting}
                         >
                           Choose File
@@ -542,73 +619,129 @@ export default function UpdateEventPage() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="price">Ticket Price (₦) *</Label>
-                        <Input
-                          id="price"
-                          type="number"
-                          placeholder="0 for free events"
-                          {...register("price")}
-                          min="0"
-                          step="100"
-                          disabled={isPending || isSubmitting}
-                        />
-                        <p className="text-xs text-gray-500">
-                          Set to 0 for free events
+                    <div className="space-y-4">
+                      <Label>Ticket Categories *</Label>
+                      {ticketCategories.map((category, index) => (
+                        <motion.div
+                          key={category.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="border border-gray-200 rounded-lg p-4 space-y-4"
+                        >
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor={`ticketCategories.${index}.name`}>
+                                Category Name
+                              </Label>
+                              <Input
+                                id={`ticketCategories.${index}.name`}
+                                placeholder="e.g., VIP, General Admission"
+                                {...register(`ticketCategories.${index}.name`)}
+                                // disabled={index === 0 || isPending || isSubmitting}
+                              />
+                              {errors.ticketCategories?.[index]?.name && (
+                                <p className="text-sm text-red-600">
+                                  {errors.ticketCategories[index].name?.message}
+                                </p>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor={`ticketCategories.${index}.price`}>
+                                Price (₦)
+                              </Label>
+                              <Input
+                                id={`ticketCategories.${index}.price`}
+                                type="number"
+                                placeholder="0 for free"
+                                {...register(`ticketCategories.${index}.price`)}
+                                min="0"
+                                step="100"
+                                disabled={isPending || isSubmitting}
+                              />
+                              {errors.ticketCategories?.[index]?.price && (
+                                <p className="text-sm text-red-600">
+                                  {errors.ticketCategories[index].price?.message}
+                                </p>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              <Label
+                                htmlFor={`ticketCategories.${index}.maxTickets`}
+                              >
+                                Total Tickets
+                              </Label>
+                              <Input
+                                id={`ticketCategories.${index}.maxTickets`}
+                                type="number"
+                                placeholder="Number of tickets"
+                                {...register(`ticketCategories.${index}.maxTickets`)}
+                                min={event?.ticketCategories?.[index]?.soldTickets || 1}
+                                disabled={isPending || isSubmitting}
+                              />
+                              {errors.ticketCategories?.[index]?.maxTickets && (
+                                <p className="text-sm text-red-600">
+                                  {errors.ticketCategories[index].maxTickets?.message}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          {index > 0 && (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleRemoveCategory(category.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                              disabled={isPending || isSubmitting}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remove
+                            </Button>
+                          )}
+                        </motion.div>
+                      ))}
+                      {errors.ticketCategories && (
+                        <p className="text-sm text-red-600">
+                          {errors.ticketCategories.message}
                         </p>
-                        {errors.price && (
-                          <p className="text-sm text-red-600">
-                            {errors.price.message}
-                          </p>
-                        )}
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="quantity">Total Tickets *</Label>
-                        <Input
-                          id="quantity"
-                          type="number"
-                          placeholder="Number of tickets"
-                          {...register("quantity")}
-                          min={event?.soldTickets || 1}
-                          disabled={isPending || isSubmitting}
-                        />
-                        {errors.quantity && (
-                          <p className="text-sm text-red-600">
-                            {errors.quantity.message}
-                          </p>
-                        )}
-                      </div>
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="bg-transparent"
+                        onClick={handleAddCategory}
+                        disabled={isPending || isSubmitting}
+                      >
+                        Add Category
+                      </Button>
                     </div>
 
-                    {watch("price") > 0 && (
+                    {ticketCategories.some((cat) => cat.price > 0) && (
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <h4 className="font-medium text-blue-900 mb-2">
                           Pricing Breakdown
                         </h4>
-                        <div className="space-y-1 text-sm text-blue-800">
-                          <div className="flex justify-between">
-                            <span>Ticket Price:</span>
-                            <span>₦{watch("price").toLocaleString()}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Platform Fee (5%):</span>
-                            <span>
-                              ₦
-                              {Math.round(
-                                watch("price") * 0.05
-                              ).toLocaleString()}
-                            </span>
-                          </div>
-                          <div className="flex justify-between font-medium border-t border-blue-300 pt-1">
-                            <span>You receive per ticket:</span>
-                            <span>
-                              ₦
-                              {Math.round(
-                                watch("price") * 0.95
-                              ).toLocaleString()}
-                            </span>
-                          </div>
+                        <div className="space-y-2 text-sm text-blue-800">
+                          {ticketCategories.map((cat, index) => (
+                            <div key={cat.id} className="space-y-1">
+                              <div className="flex justify-between">
+                                <span>{cat.name} Price:</span>
+                                <span>₦{cat.price.toLocaleString()}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Platform Fee (5%):</span>
+                                <span>
+                                  ₦{Math.round(cat.price * 0.05).toLocaleString()}
+                                </span>
+                              </div>
+                              <div className="flex justify-between font-medium border-t border-blue-300 pt-1">
+                                <span>You receive per {cat.name} ticket:</span>
+                                <span>
+                                  ₦{Math.round(cat.price * 0.95).toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
@@ -660,18 +793,12 @@ export default function UpdateEventPage() {
                             </p>
                           </div>
                           <div>
-                            <span className="text-gray-600">Price:</span>
-                            <p className="font-medium">
-                              {watch("price") === 0
-                                ? "Free"
-                                : `₦${watch("price").toLocaleString()}`}
-                            </p>
-                          </div>
-                          <div>
-                            <span className="text-gray-600">
-                              Total Tickets:
-                            </span>
-                            <p className="font-medium">{watch("quantity")}</p>
+                            <span className="text-gray-600">Ticket Categories:</span>
+                            {ticketCategories.map((cat) => (
+                              <p key={cat.id} className="font-medium">
+                                {cat.name}: ₦{cat.price.toLocaleString()} ({cat.maxTickets} tickets)
+                              </p>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -688,7 +815,7 @@ export default function UpdateEventPage() {
                       </div>
                     )}
 
-                    {watch("price") > 0 && (
+                    {ticketCategories.some((cat) => cat.price > 0) && (
                       <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                         <h4 className="font-medium text-green-900 mb-2">
                           Revenue Projection
@@ -698,11 +825,12 @@ export default function UpdateEventPage() {
                             <span>If all tickets sell:</span>
                             <span className="font-medium">
                               ₦
-                              {(
-                                watch("price") *
-                                watch("quantity") *
-                                0.95
-                              ).toLocaleString()}
+                              {ticketCategories
+                                .reduce(
+                                  (sum, cat) => sum + cat.price * cat.maxTickets * 0.95,
+                                  0
+                                )
+                                .toLocaleString()}
                             </span>
                           </div>
                         </div>
