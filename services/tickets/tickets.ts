@@ -78,7 +78,17 @@ export const verifyTicket = async (data: {
   ticketId?: string;
   code?: string;
   eventId: string;
-}): Promise<{ isValid: boolean; ticket?: Ticket }> => {
+}): Promise<{
+  status: string;
+  ticketId: string;
+  code: string;
+  eventId: string;
+  ticketCategory: TicketCategory | undefined;
+  markedUsed: boolean;
+  resalePrice: any;
+  event: Event | undefined;
+  message: string | undefined; isValid: boolean; ticket?: Ticket 
+}> => {
   try {
     const res = await axios.post("/tickets/verify", data);
     toast.success(res.data.message || "Ticket verified successfully");

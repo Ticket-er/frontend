@@ -1,6 +1,7 @@
 "use client";
 
 import Axios from "@/services/axios";
+import { useRouter } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -8,7 +9,6 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
-
 
 interface User {
   id: string;
@@ -30,6 +30,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -66,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    router.push("/login");
     localStorage.removeItem("ticketer-user");
     localStorage.removeItem("ticketer-token");
   };
