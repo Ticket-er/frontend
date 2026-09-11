@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { Footer } from "@/components/layout/footer";
 import { OrganiserHeroSection } from "@/components/for-organisers/organiser-hero-section";
+import { OrganiserExtrasSection } from "@/components/for-organisers/organiser-extras-section";
 import { HomeCard } from "@/components/home/home-card";
 
 function SectionSkeleton({ height }: { height: string }) {
@@ -92,6 +93,7 @@ export default function ForOrganisersPage() {
       <OrganiserCheckinSection />
       <OrganiserAttendeeSection />
       <OrganiserCommunitySection />
+      <OrganiserExtrasSection />
       <OrganiserPayoutsSection />
       <OrganiserFAQSection />
       <OrganiserFinalCTASection />
